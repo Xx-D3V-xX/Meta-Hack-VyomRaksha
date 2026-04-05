@@ -1,12 +1,3 @@
----
-title: VyomRaksha — Deep Space Mission Control
-emoji: 🚀
-colorFrom: indigo
-colorTo: blue
-sdk: docker
-pinned: false
----
-
 # VyomRaksha
 
 > *"Cosmic Protection"* — An OpenEnv environment for AI deep space mission operations
