@@ -7,7 +7,7 @@ sdk: docker
 pinned: false
 ---
 
-# VyomRaksha (व्योमरक्षा)
+# VyomRaksha
 
 > *"Cosmic Protection"* — An OpenEnv environment for AI deep space mission operations
 
@@ -23,7 +23,7 @@ VyomRaksha is an OpenEnv-compliant reinforcement learning environment where an A
 
 The agent must allocate three onboard resources — **power**, **fuel**, and **time** — to accomplish science objectives while detecting, assessing, and responding to cosmic threats. Every decision has downstream consequences. There is no undo.
 
-The novel mechanic at the heart of VyomRaksha is the **AkashBodh (आकाशबोध) threat detection pipeline** — a five-stage system (detect → triage → characterize → respond → comms) where information gathering itself has a cost. Spending power on triage gives better threat assessment, which requires less fuel for precise maneuvers. Skipping triage is faster but wastes fuel. The agent must find the optimal tradeoff under time pressure.
+The novel mechanic at the heart of VyomRaksha is the **AkashBodh threat detection pipeline** — a five-stage system (detect → triage → characterize → respond → comms) where information gathering itself has a cost. Spending power on triage gives better threat assessment, which requires less fuel for precise maneuvers. Skipping triage is faster but wastes fuel. The agent must find the optimal tradeoff under time pressure.
 
 ---
 
@@ -125,7 +125,7 @@ class ProbeAction(BaseModel):
 ## The Three Tasks
 
 ### Task 1 — Routine Operations Sol (Easy)
-**Codename:** Dincharya (दिनचर्या)
+**Codename:** Dincharya
 
 Deep space probe. Power 88%, Fuel 95%, 480-minute window. No cosmic threats. Three science objectives to complete and transmit before the comms window closes.
 
@@ -141,7 +141,7 @@ score = (objectives_completed/3)*0.5 + (data_transmitted ? 0.25 : 0) + resource_
 ---
 
 ### Task 2 — The Opportunity Dilemma (Medium)
-**Codename:** Sankat (संकट)
+**Codename:** Sankat
 
 Power 52%, Fuel 68%, 360-minute window. A solar flare is detected at episode start — it will hit in 60 minutes. Simultaneously, a rare stellar alignment opens a HIGH-priority science window that expires in 90 minutes. Triage costs 18% power. Science capture costs 15% power. The agent cannot do both fully.
 
@@ -158,7 +158,7 @@ score = science_value_captured*0.35 + threat_handling_quality*0.40 + resource_st
 ---
 
 ### Task 3 — Full Threat Response Pipeline (Hard)
-**Codename:** Raksha Chakra (रक्षाचक्र)
+**Codename:** Raksha Chakra
 
 Power 71%, Fuel 44%, 480-minute window. A debris field is detected at T+60 minutes (mid-episode). The agent must run the full AkashBodh pipeline on it. At some point after T+120 (random, seeded), a second threat (solar flare) appears. The agent must manage two parallel pipeline tracks with a shared resource pool. One comms window available — must choose between Earth notification and science data transmission.
 
@@ -349,9 +349,9 @@ VyomRaksha uses a **physics-lite abstraction** — not full orbital mechanics. N
 
 ## The Name
 
-**VyomRaksha (व्योमरक्षा)** — from Sanskrit: *Vyom* (cosmos/space) + *Raksha* (protection/defense). Maps directly to the environment's core mechanic: protecting a spacecraft through intelligent decision-making in the cosmos.
+**VyomRaksha** — from Sanskrit: *Vyom* (cosmos/space) + *Raksha* (protection/defense). Maps directly to the environment's core mechanic: protecting a spacecraft through intelligent decision-making in the cosmos.
 
-**AkashBodh (आकाशबोध)** — from Sanskrit: *Akash* (sky/space) + *Bodh* (awareness/intelligence). The internal name for the threat detection pipeline module.
+**AkashBodh** — from Sanskrit: *Akash* (sky/space) + *Bodh* (awareness/intelligence). The internal name for the threat detection pipeline module.
 
 Named in the spirit of ISRO's mission naming tradition: Mangalyaan (Mars Craft), Chandrayaan (Moon Craft), Aditya (Sun).
 
