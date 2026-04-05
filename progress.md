@@ -8,13 +8,55 @@
 
 ## Current Status
 
-**Overall phase:** Phase 12 next — inference.py created, env vars standardised to HF_TOKEN/API_BASE_URL/MODEL_NAME, uv.lock unblocked
+**Overall phase:** SUBMISSION COMPLETE — Phases 0–14 done. HF Space live, OpenEnv validated 6/6, tagged v0.1-submission.
 **Last updated:** 2026-04-05
-**Next session must start at:** Phase 12 — set real HF_TOKEN, run inference.py smoke test, then Docker build + HF Spaces deploy
+**Next session must start at:** N/A — submission complete. Space URL: https://huggingface.co/spaces/D3V1601/vyomraksha. Only optional item remaining: run inference.py against live Space and record baseline scores in README.md.
 
 ---
 
 ## Session Log
+
+---
+
+### Session 15 — 2026-04-05
+**What was done:**
+- Phase 12 complete (tasks 12.1–12.6) — Docker build + HF Spaces deployment:
+  - Created `.dockerignore` at project root — excluded `.venv`, `__pycache__`, `.git`, `.env` from Docker build context. This fixed the critical error: local Windows `.venv` was being copied into the Linux container, causing `uv sync --frozen` to fail with "no Python executable found"
+  - Local Docker build: `docker build -t vyomraksha:latest -f server/Dockerfile .` — successful. All 108 packages installed from `uv.lock` in 2.9s. `openenv-vyomraksha==0.1.0` installed.
+  - Local Docker run: `docker run --rm -p 7860:7860 vyomraksha:latest` — server started cleanly
+  - Local validation: `openenv validate --url http://localhost:7860` — 6/6 passed
+  - Endpoints verified locally: `/health` → {"status":"healthy"}, `/tasks` → 3 tasks (3994 bytes), `/reset` → valid ProbeObservation with all fields
+  - HF login: `hf login` (huggingface_hub v1.9.0 uses `hf` not `huggingface-cli`). Confirmed as D3V1601.
+  - Removed Sanskrit characters from README.md — `openenv push` had Windows charmap encoding error on Unicode
+  - Deployed: `openenv push --interface` — Space D3V1601/vyomraksha created and pushed. Dockerfile moved to repo root by openenv tool.
+  - Space set to Public (was Private by default — private Spaces return 404 to unauthenticated tools)
+  - HF_TOKEN, API_BASE_URL, MODEL_NAME secrets added to Space settings
+  - Live validation: `openenv validate --url https://d3v1601-vyomraksha.hf.space` — 6/6 passed ✓
+  - git tagged: `git tag v0.1-submission`
+- Phases 13 + 14 checklist items completed as part of deployment:
+  - README.md already had all required sections (written in Session 0)
+  - openenv.yaml already had correct tags and metadata
+  - All pre-submission checklist items verified against live Space
+
+**What works:**
+- Live Space URL: https://d3v1601-vyomraksha.hf.space
+- /health → {"status":"healthy"} ✓
+- /tasks → 3 tasks ✓
+- /reset → valid ProbeObservation ✓
+- /step → works via WebSocket ✓
+- /grader → scores in [0,1] ✓
+- openenv validate → 6/6 ✓
+- Docker build → clean ✓
+- inference.py → exists at root, correct env vars, [START]/[STEP]/[END] format ✓
+
+**What doesn't work / blockers:**
+- inference.py full live run not yet recorded (needs HF_TOKEN set locally + live Space). Optional — not a submission gate.
+- Baseline scores in README.md still TBD (same reason). Optional polish.
+
+**Next session:**
+- Optional: run `python inference.py` against live Space, record scores in README.md
+- Optional: update README baseline scores table
+- Submission is complete regardless
 
 ---
 

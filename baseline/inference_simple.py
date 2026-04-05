@@ -1,24 +1,25 @@
 """
 VyomRaksha — baseline/inference_simple.py
 
-Single-turn baseline agent: one Gemini API call per step.
+Single-turn baseline agent: one LLM API call per step.
 Each step sends only the current telemetry_summary + available_actions.
 No conversation history is maintained across steps.
 
-Uses Gemini via the OpenAI-compatible endpoint so no extra SDK is needed.
+Uses the OpenAI-compatible client with the HuggingFace Inference Router.
 
 Usage (standalone):
     python -m baseline.inference_simple
 
 Requirements:
-    pip install openai   (the openai package works with Gemini's compat layer)
+    pip install openai
 
-API key:
-    Set HF_TOKEN in your .env file or environment before running.
+Environment variables:
+    HF_TOKEN       — HuggingFace token (required)
+    API_BASE_URL   — LLM endpoint (default: https://router.huggingface.co/v1)
+    MODEL_NAME     — model identifier (default: Qwen/Qwen2.5-72B-Instruct)
 
 Reproducibility:
-    Uses temperature=0 and model=gemini-2.0-flash.
-    Scores are stable across runs for the same seed (seeded environment).
+    Uses temperature=0. Scores are stable across runs for the same seed.
 """
 
 from __future__ import annotations
@@ -52,7 +53,6 @@ log = logging.getLogger(__name__)
 MODEL = os.environ.get("MODEL_NAME", "Qwen/Qwen2.5-72B-Instruct")
 TEMPERATURE = 0
 MAX_STEPS_PER_EPISODE = 200  # safety cap — episodes self-terminate via episode_done
-# GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/"  # superseded by API_BASE_URL env var
 
 # ---------------------------------------------------------------------------
 # Prompt helpers
@@ -210,7 +210,7 @@ def run_episode(env: VyomRakshaEnvironment, task_id: int, client: Any) -> list[d
 
 def run_all_tasks() -> dict[str, float]:
     """
-    Run inference_simple on all 3 tasks using Gemini.
+    Run inference_simple on all 3 tasks.
     Returns {"task1": score, "task2": score, "task3": score}.
 
     Raises RuntimeError if HF_TOKEN is not set.
