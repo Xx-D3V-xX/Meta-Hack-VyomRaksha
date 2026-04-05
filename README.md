@@ -124,8 +124,7 @@ class ProbeAction(BaseModel):
 
 ## The Three Tasks
 
-### Task 1 — Routine Operations Sol (Easy)
-**Codename:** Dincharya
+### Task 1 — Routine Operations (Easy)
 
 Deep space probe. Power 88%, Fuel 95%, 480-minute window. No cosmic threats. Three science objectives to complete and transmit before the comms window closes.
 
@@ -141,7 +140,6 @@ score = (objectives_completed/3)*0.5 + (data_transmitted ? 0.25 : 0) + resource_
 ---
 
 ### Task 2 — The Opportunity Dilemma (Medium)
-**Codename:** Sankat
 
 Power 52%, Fuel 68%, 360-minute window. A solar flare is detected at episode start — it will hit in 60 minutes. Simultaneously, a rare stellar alignment opens a HIGH-priority science window that expires in 90 minutes. Triage costs 18% power. Science capture costs 15% power. The agent cannot do both fully.
 
@@ -158,7 +156,6 @@ score = science_value_captured*0.35 + threat_handling_quality*0.40 + resource_st
 ---
 
 ### Task 3 — Full Threat Response Pipeline (Hard)
-**Codename:** Raksha Chakra
 
 Power 71%, Fuel 44%, 480-minute window. A debris field is detected at T+60 minutes (mid-episode). The agent must run the full AkashBodh pipeline on it. At some point after T+120 (random, seeded), a second threat (solar flare) appears. The agent must manage two parallel pipeline tracks with a shared resource pool. One comms window available — must choose between Earth notification and science data transmission.
 
@@ -308,16 +305,6 @@ pytest tests/ --cov=server --cov-report=term-missing
 ```bash
 openenv validate
 ```
-
----
-
-## Deployment to Hugging Face Spaces
-
-```bash
-huggingface-cli login
-openenv push --enable-interface
-```
-
 ---
 
 ## Simulation Model
@@ -334,19 +321,6 @@ VyomRaksha uses a **physics-lite abstraction** — not full orbital mechanics. N
 
 ---
 
-## Baseline Scores
-
-> Recorded using `gpt-4o-mini` at `temperature=0`. Reproducible across runs.
-
-| Task | Score | Notes |
-|------|-------|-------|
-| Task 1 — Dincharya (Easy) | TBD | Run `python baseline/inference_simple.py --task 1` |
-| Task 2 — Sankat (Medium) | TBD | Run `python baseline/inference_simple.py --task 2` |
-| Task 3 — Raksha Chakra (Hard) | TBD | Run `python baseline/inference_simple.py --task 3` |
-| **Average** | **TBD** | |
-
----
-
 ## The Name
 
 **VyomRaksha** — from Sanskrit: *Vyom* (cosmos/space) + *Raksha* (protection/defense). Maps directly to the environment's core mechanic: protecting a spacecraft through intelligent decision-making in the cosmos.
@@ -356,12 +330,3 @@ VyomRaksha uses a **physics-lite abstraction** — not full orbital mechanics. N
 Named in the spirit of ISRO's mission naming tradition: Mangalyaan (Mars Craft), Chandrayaan (Moon Craft), Aditya (Sun).
 
 ---
-
-## License
-
-MIT License.
-
----
-
-*Built for the AgentBeats OpenEnv Challenge — Meta PyTorch + Hugging Face, 2026.*
-*Team: D3V1601 | Environment: VyomRaksha | Pipeline: AkashBodh*
