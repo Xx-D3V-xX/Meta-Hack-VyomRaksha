@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ---
 title: VyomRaksha — Deep Space Mission Control
 emoji: 🚀
@@ -8,6 +9,8 @@ pinned: false
 base_path: /web
 ---
 
+=======
+>>>>>>> 2f7361e (Clean up README by removing metadata)
 # VyomRaksha
 
 > *"Cosmic Protection"* — An OpenEnv environment for AI deep space mission operations
