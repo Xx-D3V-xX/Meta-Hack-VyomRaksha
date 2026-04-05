@@ -1,0 +1,39 @@
+{
+  "task_id": 3,
+  "seed": 999,
+  "mission_window_minutes": 480,
+  "initial_power": 71.0,
+  "initial_fuel": 44.0,
+  "objectives": [
+    {
+      "id": "geo_survey",
+      "name": "Geological Survey",
+      "priority": "MEDIUM",
+      "power_cost": 12,
+      "time_cost": 45,
+      "deadline_min": 360
+    }
+  ],
+  "comms_windows": [
+    {"open_at": 120, "close_at": 160}
+  ],
+  "eclipse_periods": [
+    {"start": 300, "end": 350}
+  ],
+  "events": [
+    {
+      "type": "debris_field",
+      "detection_at": 60,
+      "time_to_impact": 140,
+      "intensity": "HIGH",
+      "note": "First threat — appears mid-episode at T+60"
+    },
+    {
+      "type": "solar_flare",
+      "detection_at": "random_after_120",
+      "time_to_impact_range": [40, 90],
+      "intensity": "seeded",
+      "note": "Second threat — random appearance after T+120, seeded by task seed"
+    }
+  ]
+}
