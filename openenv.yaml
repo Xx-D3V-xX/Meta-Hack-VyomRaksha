@@ -1,0 +1,14 @@
+spec_version: 1
+name: vyomraksha
+version: "0.1.0"
+description: "VyomRaksha — Deep space probe mission control RL environment. An AI agent allocates power, fuel, and time to accomplish science objectives while detecting and responding to cosmic threats via the AkashBodh 5-stage threat pipeline."
+type: space
+runtime: fastapi
+app: server.app:app
+port: 7860
+tags:
+  - openenv
+  - space
+  - mission-control
+  - rl-environment
+

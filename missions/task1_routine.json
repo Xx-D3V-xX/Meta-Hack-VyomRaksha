@@ -1,0 +1,40 @@
+{
+  "task_id": 1,
+  "seed": 42,
+  "mission_window_minutes": 480,
+  "initial_power": 88.0,
+  "initial_fuel": 95.0,
+  "objectives": [
+    {
+      "id": "geo_survey",
+      "name": "Geological Survey",
+      "priority": "HIGH",
+      "power_cost": 12,
+      "time_cost": 45,
+      "deadline_min": 360
+    },
+    {
+      "id": "atmo_read",
+      "name": "Atmospheric Reading",
+      "priority": "MEDIUM",
+      "power_cost": 8,
+      "time_cost": 30,
+      "deadline_min": 420
+    },
+    {
+      "id": "thermal_img",
+      "name": "Thermal Imaging",
+      "priority": "LOW",
+      "power_cost": 5,
+      "time_cost": 20,
+      "deadline_min": 460
+    }
+  ],
+  "comms_windows": [
+    {"open_at": 200, "close_at": 290}
+  ],
+  "eclipse_periods": [
+    {"start": 380, "end": 430}
+  ],
+  "events": []
+}
