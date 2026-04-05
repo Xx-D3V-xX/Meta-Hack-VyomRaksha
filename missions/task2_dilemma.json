@@ -1,0 +1,32 @@
+{
+  "task_id": 2,
+  "seed": 137,
+  "mission_window_minutes": 360,
+  "initial_power": 52.0,
+  "initial_fuel": 68.0,
+  "objectives": [
+    {
+      "id": "rare_alignment",
+      "name": "Rare Stellar Alignment Capture",
+      "priority": "HIGH",
+      "power_cost": 15,
+      "time_cost": 40,
+      "deadline_min": 90,
+      "note": "Once-in-mission window — expires at T+90"
+    }
+  ],
+  "comms_windows": [
+    {"open_at": 55, "close_at": 75}
+  ],
+  "eclipse_periods": [],
+  "events": [
+    {
+      "type": "solar_flare",
+      "detection_at": 0,
+      "time_to_impact": 60,
+      "intensity": "MEDIUM",
+      "triage_power_needed": 18,
+      "note": "Detected at episode start — simultaneous with science window"
+    }
+  ]
+}
