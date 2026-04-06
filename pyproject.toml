@@ -17,7 +17,7 @@ dependencies = [
     # Core OpenEnv runtime (provides FastAPI server + HTTP client types)
     # install from github
     # "openenv-core[core] @ git+https://github.com/meta-pytorch/OpenEnv.git",
-    "openenv-core[core]>=0.2.1",
+    "openenv-core[core]>=0.2.3",
     # Environment-specific dependencies
     "numpy>=1.24.0",
     "python-dotenv>=1.0.0",
