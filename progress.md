@@ -8,13 +8,46 @@
 
 ## Current Status
 
-**Overall phase:** SUBMISSION COMPLETE — Phases 0–14 done. HF Space live, OpenEnv validated 6/6, tagged v0.1-submission.
-**Last updated:** 2026-04-05
-**Next session must start at:** N/A — submission complete. Space URL: https://huggingface.co/spaces/D3V1601/vyomraksha. Only optional item remaining: run inference.py against live Space and record baseline scores in README.md.
+**Overall phase:** POST-SUBMISSION — Reference env audit complete. 4 files updated (Dockerfile UTF-8 fix + build-essential, README frontmatter, pyproject.toml + requirements.txt openenv-core bump to 0.2.3).
+**Last updated:** 2026-04-06
+**Next session must start at:** Run `uv lock`, then commit + push all changes to both origin and hf remotes.
 
 ---
 
 ## Session Log
+
+---
+
+### Session 16 — 2026-04-06
+**What was done:**
+- Reference environment audit: read all 5 reference envs (calendar, reasoning_gym, tbench2, carla, repl)
+- Inspected openenv-core PyPI releases: 0.2.1 → 0.2.2 → 0.2.3 (latest)
+- Confirmed zero breaking changes for VyomRaksha across all three versions:
+  - `rubric` param in `Environment.__init__` is optional (default None)
+  - `HealthStatus.HEALTHY` is a StrEnum — still matches string `"healthy"` in validate check
+  - `gradio_builder` param in `create_app()` is optional keyword arg
+  - `WSErrorCode`, `ServerMode` are internal additions
+- **Dockerfile:** Recreated as clean UTF-8 (was still UTF-16 LE BOM from Session 15 attempt). Added `build-essential` to apt-get install to match reference env pattern.
+- **README.md:** Added `app_port: 7860` and `tags: - openenv` to HF frontmatter (matched canonical pattern from calendar_env)
+- **pyproject.toml:** Bumped `openenv-core[core]>=0.2.1` → `>=0.2.3`
+- **server/requirements.txt:** Fixed `openenv[core]>=0.2.0` → `openenv-core[core]>=0.2.3` (also fixed wrong package name — `openenv` vs `openenv-core`)
+- Confirmed Dockerfile is already at project root (correct per openenv push behavior and v0.2.2+ detection)
+- Confirmed Qwen is not mandated anywhere — MODEL_NAME is a free env var
+- Confirmed uv.lock is committed to repo
+
+**What works:**
+- All 4 files cleanly updated
+- No breaking changes introduced
+
+**What doesn't work / blockers:**
+- uv.lock may need regeneration if openenv-core 0.2.3 pulls a different dependency tree. Run `uv lock` before pushing.
+
+**Next session:**
+- Run `uv lock` to regenerate lockfile for 0.2.3
+- Commit all changes: `git add README.md pyproject.toml server/requirements.txt Dockerfile uv.lock`
+- `git commit -m "chore: bump openenv-core to 0.2.3, fix README HF frontmatter, harden Dockerfile"`
+- `git push origin main`
+- `git push hf main --force`
 
 ---
 
