@@ -6,6 +6,7 @@ __pycache__/
 *.egg-info/
 dist/
 .claude
-todo.md
-CLAUDE.md
-progress.md
+# tasks/*
+# progress.md
+# progress_r2.md
+# CLAUDE.md
