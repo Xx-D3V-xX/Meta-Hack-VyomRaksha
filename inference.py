@@ -25,6 +25,7 @@ Environment variables (all read from env / .env):
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import os
@@ -68,7 +69,7 @@ TASK_NAMES: dict[int, str] = {
 }
 
 # ---------------------------------------------------------------------------
-# Prompt helpers — copied verbatim from baseline/inference_simple.py
+# Prompt helpers
 # ---------------------------------------------------------------------------
 
 _SYSTEM_PROMPT = """\
@@ -118,7 +119,7 @@ def _build_step_prompt(obs_dict: dict[str, Any]) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Action parsing — copied verbatim from baseline/inference_simple.py
+# Action parsing
 # ---------------------------------------------------------------------------
 
 def _parse_action(response_text: str, available_actions: list[str]) -> ProbeAction:
@@ -127,7 +128,6 @@ def _parse_action(response_text: str, available_actions: list[str]) -> ProbeActi
     Falls back to defer on any parse error.
     """
     text = response_text.strip()
-    # Strip markdown code fences if present
     if text.startswith("```"):
         lines = text.splitlines()
         text = "\n".join(
@@ -152,10 +152,10 @@ def _parse_action(response_text: str, available_actions: list[str]) -> ProbeActi
 
 
 # ---------------------------------------------------------------------------
-# Task runner
+# Task runner — async
 # ---------------------------------------------------------------------------
 
-def run_task(env: Any, task_id: int, client: Any) -> None:
+async def run_task(env: Any, task_id: int, client: Any) -> None:
     """
     Run one full episode for task_id, printing structured log lines.
 
@@ -170,11 +170,10 @@ def run_task(env: Any, task_id: int, client: Any) -> None:
     score = 0.0
     success = False
     episode_log: list[dict[str, Any]] = []
-    error_msg: str | None = None
 
     try:
-        # reset() may return StepResult (with .observation) or bare ProbeObservation
-        reset_result = env.reset(task_id=task_id)
+        # reset() returns StepResult (with .observation) or bare ProbeObservation
+        reset_result = await env.reset(task_id=task_id)
         obs = getattr(reset_result, "observation", reset_result)
 
         while not obs.episode_done and step < MAX_STEPS_PER_EPISODE:
@@ -199,7 +198,7 @@ def run_task(env: Any, task_id: int, client: Any) -> None:
                     if "429" in str(exc) and attempt < 4:
                         wait = 60 * (attempt + 1)
                         log.warning("Rate limited, waiting %ds (attempt %d/5)...", wait, attempt + 1)
-                        time.sleep(wait)
+                        await asyncio.sleep(wait)
                     else:
                         step_error = str(exc)
                         log.error("LLM call failed: %s", exc)
@@ -209,7 +208,7 @@ def run_task(env: Any, task_id: int, client: Any) -> None:
             action_json = json.dumps(action.model_dump(), separators=(",", ":"))
 
             prev_buffer = obs.data_buffer
-            step_result = env.step(action)
+            step_result = await env.step(action)
             obs = getattr(step_result, "observation", step_result)
             step_reward: float = getattr(step_result, "reward", None) or 0.0
             if step_reward is None:
@@ -252,7 +251,6 @@ def run_task(env: Any, task_id: int, client: Any) -> None:
         success = score >= SUCCESS_SCORE_THRESHOLD
 
     except Exception as exc:
-        error_msg = str(exc)
         log.exception("Episode failed for task %d: %s", task_id, exc)
         score = 0.0
         success = False
@@ -267,11 +265,11 @@ def run_task(env: Any, task_id: int, client: Any) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Main entry point — sync path (no asyncio needed)
+# Main entry point — async
 # ---------------------------------------------------------------------------
 
-def main() -> None:
-    """Run all 3 tasks in sequence using the sync VyomRakshaEnv client."""
+async def _main() -> None:
+    """Run all 3 tasks in sequence using the async VyomRakshaEnv client."""
     if not API_KEY:
         raise RuntimeError(
             "HF_TOKEN environment variable is not set. "
@@ -285,10 +283,14 @@ def main() -> None:
 
     client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
 
-    with VyomRakshaEnv(base_url=SPACE_URL) as env:
+    async with VyomRakshaEnv(base_url=SPACE_URL) as env:
         for task_id in (1, 2, 3):
             log.info("Starting task %d (%s) ...", task_id, TASK_NAMES[task_id])
-            run_task(env, task_id, client)
+            await run_task(env, task_id, client)
+
+
+def main() -> None:
+    asyncio.run(_main())
 
 
 if __name__ == "__main__":
