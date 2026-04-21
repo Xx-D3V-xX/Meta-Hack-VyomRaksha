@@ -100,7 +100,7 @@ Confirm total token usage across all accounts is under 300K.
 > Goal: All R2 magic numbers and Pydantic models defined.
 > Exit criteria: `python -c "from models_r2 import R2ProbeObservation, SubAgentRecommendation"` succeeds.
 
-- [ ] **R2-1.1** Create `server/r2_constants.py`
+- [x] **R2-1.1** Create `server/r2_constants.py`
 
 ```
 Claude Code prompt for R2-1.1:
@@ -126,7 +126,7 @@ Reference progress_r2.md Resource Calibration Values table for all values.
 Every constant must have a comment explaining its meaning and rationale.
 ```
 
-- [ ] **R2-1.2** Create `models_r2.py`
+- [x] **R2-1.2** Create `models_r2.py`
 
 ```
 Claude Code prompt for R2-1.2:

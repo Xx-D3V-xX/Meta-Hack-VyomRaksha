@@ -8,9 +8,9 @@
 
 ## Current Status
 
-**Overall phase:** R2 PLANNING COMPLETE — Implementation not yet started.
-**Last updated:** 2026-04-20
-**Next session must start at:** Begin Phase R2-0 — generate expert trajectory data via Featherless API. See r2_todo.md Phase R2-0.
+**Overall phase:** R2 IMPLEMENTATION IN PROGRESS — Phase R2-1 complete.
+**Last updated:** 2026-04-21
+**Next session must start at:** Phase R2-2 — Create `server/probe_sim_r2.py` (extended ProbeSimulator with all 7 R2 resource domains). See r2_todo.md Phase R2-2.
 
 ---
 
@@ -124,6 +124,37 @@
   - Run generation in parallel across 3 Featherless accounts
 
 ---
+
+---
+
+### Session R2-1 — 2026-04-21
+**What was done:**
+- R2-1.1: Created `server/r2_constants.py` — all Round 2 magic numbers in 6 sections:
+  - New resource thresholds (thermal 85%/95%, structural 30%, initial values)
+  - New resource costs (thermal vent 8%, shield 12%, instrument wear 2%, compute costs, recovery rate)
+  - R2 task seeds (Task 4 = 1337, Task 5 = 2048)
+  - Reward constants (outcome rewards ±10/±8/+1–2.5, shaped reward cap 0.90, all penalties)
+  - Emergency authority constants (urgency thresholds 0.75/0.85/0.40, response latency 3 steps)
+  - Communication constants (all packet field names as string constants, strategy names)
+- R2-1.2: Created `models_r2.py` via TDD — tests written first (RED), then implementation (GREEN):
+  - `R2ResourceState`: 9 resource fields (power, fuel, thermal, compute_budget, structural_integrity,
+    data_buffer, comms_bandwidth, radiation_integrity, instrument_health) + rates_of_change dict
+  - `SubAgentRecommendation`: full comm protocol packet per CLAUDE.md Section 7
+  - `SarvaDrishtiDecision`: approved action + strategy weights + conflict/emergency fields
+  - `R2ProbeObservation`: extends ProbeObservation with R2 resources + multi-agent state fields
+  - `R2EpisodeLogEntry`: single-step replay log entry
+- Created `tests/test_models_r2.py`: 32 tests covering all models, validators, boundary conditions
+
+**What works:**
+- `python -c "from models_r2 import R2ProbeObservation, SubAgentRecommendation"` passes
+- `pytest tests/test_models_r2.py` → 32/32 passing
+- `pytest tests/` → 372/372 passing (340 R1 + 32 R2)
+
+**What doesn't work / blockers:**
+- None — clean session
+
+**Next session:**
+- Phase R2-2: Create `server/probe_sim_r2.py` — extend ProbeSimulator with all 7 resource domains and 40 action atoms
 
 <!-- Copy the session block above for each new session -->
 
