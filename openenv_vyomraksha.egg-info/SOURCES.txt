@@ -8,6 +8,7 @@ pyproject.toml
 ./client.py
 ./inference.py
 ./models.py
+./models_r2.py
 openenv_vyomraksha.egg-info/PKG-INFO
 openenv_vyomraksha.egg-info/SOURCES.txt
 openenv_vyomraksha.egg-info/dependency_links.txt
@@ -21,6 +22,8 @@ server/cosmic_events.py
 server/environment.py
 server/graders.py
 server/probe_sim.py
+server/probe_sim_r2.py
+server/r2_constants.py
 server/reward.py
 server/threat_pipeline.py
 server/vyomraksha_environment.py
@@ -28,6 +31,8 @@ tests/test_endpoints.py
 tests/test_events.py
 tests/test_graders.py
 tests/test_models.py
+tests/test_models_r2.py
 tests/test_pipeline.py
+tests/test_probe_sim_r2.py
 tests/test_resources.py
 tests/test_reward.py

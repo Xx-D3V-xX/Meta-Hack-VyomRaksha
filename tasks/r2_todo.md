@@ -170,7 +170,7 @@ Run pytest tests/test_models_r2.py — must pass. Run pytest tests/ — must sta
 > Goal: ProbeSimulator extended with all 7 R2 resource domains.
 > Exit criteria: pytest tests/test_probe_sim_r2.py passes.
 
-- [ ] **R2-2.1** Create `server/probe_sim_r2.py`
+- [x] **R2-2.1** Create `server/probe_sim_r2.py`
 
 ```
 Claude Code prompt for R2-2.1:
@@ -211,7 +211,7 @@ Run pytest tests/ — must stay green.
 > Goal: All 8 sub-agent policies implemented as loadable, callable classes.
 > Exit criteria: Each sub-agent can receive an observation and return a SubAgentRecommendation.
 
-- [ ] **R2-3.1** Create `server/sub_agents/base_agent.py`
+- [x] **R2-3.1** Create `server/sub_agents/base_agent.py`
 
 ```
 Claude Code prompt for R2-3.1:
@@ -242,7 +242,7 @@ Include emergency_authority: bool = False class variable.
 Include has_emergency_authority property.
 ```
 
-- [ ] **R2-3.2** Create individual sub-agent files (power, fuel, thermal, computational)
+- [x] **R2-3.2** Create individual sub-agent files (power, fuel, thermal, computational)
 
 ```
 Claude Code prompt for R2-3.2:
@@ -270,7 +270,7 @@ urgency scoring, emergency trigger conditions, update_from_decision behavior.
 Run pytest tests/test_sub_agents.py — must pass.
 ```
 
-- [ ] **R2-3.3** Create remaining sub-agent files (structural, communications, probe_systems, threat)
+- [x] **R2-3.3** Create remaining sub-agent files (structural, communications, probe_systems, threat)
 
 ```
 Claude Code prompt for R2-3.3:
