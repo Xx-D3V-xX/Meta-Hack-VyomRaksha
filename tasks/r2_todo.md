@@ -30,7 +30,7 @@ Phase R2-10 (Blog + Pitch) ← final deliverable
 > Exit criteria: training/data/ contains episode JSONs for all 8 sub-agents + preference pairs for SarvaDrishti.
 > Compute: Featherless API (300K tokens, 3 accounts). No GPU needed.
 
-- [ ] **R2-0.1** Create `training/` directory and `training/generate_expert_data.py`
+- [x] **R2-0.1** Create `training/` directory and `training/generate_expert_data.py`
 
 ```
 Claude Code prompt for R2-0.1:
@@ -64,7 +64,7 @@ and round-robin across them. Add --mode (demo|pairs) and --agent CLI args.
 Log token usage per account to avoid hitting 100K limit per account.
 ```
 
-- [ ] **R2-0.2** Generate sub-agent seed demonstrations (run locally, not on cluster)
+- [x] **R2-0.2** Generate sub-agent seed demonstrations (run locally, not on cluster)
 
 ```
 Claude Code prompt for R2-0.2:
@@ -82,7 +82,7 @@ After each run, verify the output file exists and contains 25 valid JSON lines.
 Log token counts from each run to progress_r2.md.
 ```
 
-- [ ] **R2-0.3** Generate SarvaDrishti preference pairs
+- [x] **R2-0.3** Generate SarvaDrishti preference pairs
 
 ```
 Claude Code prompt for R2-0.3:
