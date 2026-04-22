@@ -1,0 +1,232 @@
+[
+  {
+    "task_id": 1,
+    "episode": {
+      "task_id": 1,
+      "mission_failed": false,
+      "steps": 100,
+      "coordination_score": 0.44586681790030613,
+      "emergency_score": 0.4891192346690422,
+      "mission_score": 0.4737196498744321,
+      "cascade_score": 0.4539670196643006,
+      "conflict_detected": true,
+      "conflict_resolved_correctly": true,
+      "sarvadrishi_strategy": "CONSERVATION",
+      "sarvadrishi_action_type": "safe_mode",
+      "override_invoked": true,
+      "override_justified": true,
+      "sub_agent_urgency_calibrated": true,
+      "emergency_invoked": true,
+      "emergency_invoked_correct": true,
+      "crisis_opportunity": true,
+      "emergency_fired_for_crisis": true,
+      "cascade_alert_received": false,
+      "cascade_handled_correctly": true,
+      "objectives": [
+        {
+          "name": "primary",
+          "priority": "HIGH",
+          "completed": true
+        },
+        {
+          "name": "secondary",
+          "priority": "MEDIUM",
+          "completed": true
+        },
+        {
+          "name": "optional",
+          "priority": "LOW",
+          "completed": true
+        }
+      ],
+      "power_level": 63.107469869439484,
+      "structural_integrity": 87.20106154508085,
+      "thermal_level": 68.007015417319
+    },
+    "score": 0.47108168355777424
+  },
+  {
+    "task_id": 2,
+    "episode": {
+      "task_id": 2,
+      "mission_failed": false,
+      "steps": 100,
+      "coordination_score": 0.4502455470514144,
+      "emergency_score": 0.5786561423194536,
+      "mission_score": 0.5176514167892422,
+      "cascade_score": 0.5668921131899741,
+      "conflict_detected": true,
+      "conflict_resolved_correctly": false,
+      "sarvadrishi_strategy": "CONSERVATION",
+      "sarvadrishi_action_type": "safe_mode",
+      "override_invoked": false,
+      "override_justified": false,
+      "sub_agent_urgency_calibrated": true,
+      "emergency_invoked": true,
+      "emergency_invoked_correct": true,
+      "crisis_opportunity": true,
+      "emergency_fired_for_crisis": true,
+      "cascade_alert_received": false,
+      "cascade_handled_correctly": false,
+      "objectives": [
+        {
+          "name": "primary",
+          "priority": "HIGH",
+          "completed": true
+        },
+        {
+          "name": "secondary",
+          "priority": "MEDIUM",
+          "completed": true
+        },
+        {
+          "name": "optional",
+          "priority": "LOW",
+          "completed": false
+        }
+      ],
+      "power_level": 76.39225728701835,
+      "structural_integrity": 73.24737851370668,
+      "thermal_level": 63.24752823040341
+    },
+    "score": 0.5136410088815893
+  },
+  {
+    "task_id": 3,
+    "episode": {
+      "task_id": 3,
+      "mission_failed": false,
+      "steps": 100,
+      "coordination_score": 0.5992356212351612,
+      "emergency_score": 0.6096645421539131,
+      "mission_score": 0.5336101532145051,
+      "cascade_score": 0.5878316033727987,
+      "conflict_detected": true,
+      "conflict_resolved_correctly": false,
+      "sarvadrishi_strategy": "CONSERVATION",
+      "sarvadrishi_action_type": "safe_mode",
+      "override_invoked": false,
+      "override_justified": false,
+      "sub_agent_urgency_calibrated": false,
+      "emergency_invoked": true,
+      "emergency_invoked_correct": true,
+      "crisis_opportunity": true,
+      "emergency_fired_for_crisis": true,
+      "cascade_alert_received": false,
+      "cascade_handled_correctly": true,
+      "objectives": [
+        {
+          "name": "primary",
+          "priority": "HIGH",
+          "completed": true
+        },
+        {
+          "name": "secondary",
+          "priority": "MEDIUM",
+          "completed": true
+        },
+        {
+          "name": "optional",
+          "priority": "LOW",
+          "completed": true
+        }
+      ],
+      "power_level": 89.74644545598994,
+      "structural_integrity": 68.7166093039119,
+      "thermal_level": 65.01937134163967
+    },
+    "score": 0.5510594123115443
+  },
+  {
+    "task_id": 4,
+    "episode": {
+      "task_id": 4,
+      "mission_failed": false,
+      "steps": 100,
+      "coordination_score": 0.5567654654476568,
+      "emergency_score": 0.7452564470041773,
+      "mission_score": 0.6673102272784338,
+      "cascade_score": 0.6029390955674987,
+      "conflict_detected": true,
+      "conflict_resolved_correctly": false,
+      "sarvadrishi_strategy": "CONSERVATION",
+      "sarvadrishi_action_type": "safe_mode",
+      "override_invoked": false,
+      "override_justified": true,
+      "sub_agent_urgency_calibrated": true,
+      "emergency_invoked": true,
+      "emergency_invoked_correct": true,
+      "crisis_opportunity": true,
+      "emergency_fired_for_crisis": true,
+      "cascade_alert_received": false,
+      "cascade_handled_correctly": true,
+      "objectives": [
+        {
+          "name": "primary",
+          "priority": "HIGH",
+          "completed": true
+        },
+        {
+          "name": "secondary",
+          "priority": "MEDIUM",
+          "completed": true
+        },
+        {
+          "name": "optional",
+          "priority": "LOW",
+          "completed": false
+        }
+      ],
+      "power_level": 80.34354343425603,
+      "structural_integrity": 83.83885388439947,
+      "thermal_level": 50.69973245472708
+    },
+    "score": 0.6520034265553849
+  },
+  {
+    "task_id": 5,
+    "episode": {
+      "task_id": 5,
+      "mission_failed": false,
+      "steps": 100,
+      "coordination_score": 0.7083004885986922,
+      "emergency_score": 0.7012252555081433,
+      "mission_score": 0.7220945951435243,
+      "cascade_score": 0.6106798721631984,
+      "conflict_detected": true,
+      "conflict_resolved_correctly": true,
+      "sarvadrishi_strategy": "CONSERVATION",
+      "sarvadrishi_action_type": "safe_mode",
+      "override_invoked": false,
+      "override_justified": true,
+      "sub_agent_urgency_calibrated": true,
+      "emergency_invoked": true,
+      "emergency_invoked_correct": false,
+      "crisis_opportunity": true,
+      "emergency_fired_for_crisis": true,
+      "cascade_alert_received": true,
+      "cascade_handled_correctly": true,
+      "objectives": [
+        {
+          "name": "primary",
+          "priority": "HIGH",
+          "completed": true
+        },
+        {
+          "name": "secondary",
+          "priority": "MEDIUM",
+          "completed": true
+        },
+        {
+          "name": "optional",
+          "priority": "LOW",
+          "completed": true
+        }
+      ],
+      "power_level": 60.381119071593254,
+      "structural_integrity": 73.43316677710621,
+      "thermal_level": 50.74597996096308
+    },
+    "score": 0.6995106220096587
+  }
+]

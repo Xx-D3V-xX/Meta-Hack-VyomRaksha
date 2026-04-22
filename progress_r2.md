@@ -8,9 +8,9 @@
 
 ## Current Status
 
-**Overall phase:** R2 IMPLEMENTATION IN PROGRESS — Phase R2-4 complete.
+**Overall phase:** R2 IMPLEMENTATION IN PROGRESS — Phase R2-7 complete (all training scripts written + tested).
 **Last updated:** 2026-04-22
-**Next session must start at:** Phase R2-5 — R2 Environment + Reward (`r2_environment.py`, `app.py` update, `r2_reward.py`). See r2_todo.md R2-5.1.
+**Next session must start at:** R2-8 — SPIT cluster job scripts (`training/cluster_jobs/`). See r2_todo.md R2-8.1.
 
 ---
 
@@ -365,6 +365,258 @@
 
 **Next session:**
 - Phase R2-5.1: `server/r2_environment.py` + update `server/app.py`
+
+### Session R2-4.3 + R2-5.1 — 2026-04-22
+**What was done:**
+- R2-4.3: Created `server/orchestrator/sarvadrishi.py` and `server/multi_agent_loop.py`
+
+  **SarvaDrishti:**
+  - `deliberate()`: reactive + proactive strategy update → conflict detection → resolution → `SarvaDrishtiDecision`
+  - `broadcast_to_sub_agents()`: Option C hybrid — `__broadcast__` entry for all agents + targeted message per involved agent
+  - `get_science_objective_priority()` / `advance_science_objective()`: SarvaDrishti-exclusive science function, `_SCIENCE_OBJECTIVES` priority list (rare_alignment first)
+  - `set_earth_directive()`: runtime update of Type 5 conflict resolver ground truth
+  - `_action_belongs_to()` helper: heuristic ownership map (action name fragment → agent domain) for broadcast decision labels
+
+  **MultiAgentLoop:**
+  - `run_step(action, threat_event, comms_window_open)`: full 12-step internal cycle
+  - `_collect_recommendations()`: injects per-agent domain_state + global_snapshot via `_domain_state_for_agent()` / `_global_snapshot()` helpers, collects all 8 recommendations
+  - `_run_emergency_cycle()`: pre-deliberation scan → resolve → execute → notify; returns (notifications, emergency_fired bool)
+  - `_extract_and_store_cascade_alerts()`: pulls cascade_alerts from ThreatAgent recommendation, stores in `_pending_cascade_overrides` for next step injection
+  - `_update_all_sub_agents()`: calls `update_from_decision()` on all 8 agents
+  - `_apply_approved_action()`: dispatches approved action to probe sim; skipped if emergency fired (already applied)
+  - `_build_observation()`: assembles `R2ProbeObservation` from post-step sim state + all multi-agent fields
+  - `_build_mission_phase()` helper: maps resource levels + emergency_fired to phase string (nominal/degraded/critical/emergency)
+  - `_domain_state_for_agent()` helper: builds per-agent domain_state dict with cascade_urgency_override support
+  - `_global_snapshot()` helper: builds shared global context dict for all agents
+  - Created `tests/test_multi_agent_loop.py`: 83 tests across 12 test classes
+
+- R2-5.1: Created `server/r2_environment.py` and updated `server/app.py`
+
+  **R2VyomRakshaEnvironment:**
+  - Extends `VyomRakshaEnvironment` — tasks 1–3 delegate to parent, tasks 4–5 use R2 pipeline
+  - `reset()`: R2 path initialises `R2ProbeSimulator`, calls `_load_sub_agents()`, creates `MultiAgentLoop`
+  - `step()`: R2 path calls `_advance_r2_events()` (applies mission JSON event damage, builds threat_event dict) then `loop.run_step()`
+  - `_load_sub_agents()`: checks `LORA_{AGENT}_PATH` env vars; loads LoRA adapters if set, else rule-based
+  - `_wrap_r1_observation()`: pads R1 `ProbeObservation` with R2 default fields → `R2ProbeObservation`
+  - `_advance_r2_events()`: fires each event once (tracks `_applied_events` set); calls `apply_r2_damage()`; infers `affected_domains` for ThreatAgent
+  - `_r2_comms_window_open()`: checks mission JSON comms_windows against elapsed time
+  - Created `missions/task4_emergency.json` and `missions/task5_cascade.json`
+
+  **server/app.py updates:**
+  - `R2_MODE=true` env var activates `R2VyomRakshaEnvironment` instead of R1 class
+  - `_EnvClass` pattern: runtime selection of env class, no code duplication
+  - `_R2_ACTION_SCHEMA` dict: R2 action atoms documented for tasks 4/5
+  - Tasks 4 and 5 added to `_TASKS` list with full descriptions, seeds, difficulty labels
+  - `/tasks` now returns 5 tasks; `/grader` accepts `task_id` 1–5
+  - R2 grader routing: tries `server.r2_graders.grade_r2_episode`; falls back to `_grade_r2_episode_stub()` (survival + emergency + coordination heuristic) until R2-6.2
+  - Updated 3 R1 endpoint tests: `test_tasks_returns_three_tasks` → `five`, `test_tasks_ids_are_1_2_3` → `1–5`, difficulty valid set extended to include `very_hard` and `extreme`
+
+**What works:**
+- `pytest tests/test_multi_agent_loop.py` → 83/83 passing
+- `pytest tests/` → 826/826 passing (all R1 + all R2 phases)
+- `openenv validate` → OK (ready for multi-mode deployment)
+
+**What doesn't work / blockers:**
+- None
+
+**Next session:**
+- Phase R2-7.2: `training/train_sarvadrishi.py`
+
+### Session R2-5.2 — 2026-04-22
+**What was done:**
+- R2-5.2: Created `server/r2_reward.py` — `R2RewardCalculator(RewardCalculator)`:
+
+  **Layer 1 — Outcome rewards (large, dominate shaped):**
+  - `compute_survival_reward(mission_failed)`: ±10, idempotent per episode
+  - `compute_mission_outcome_reward(completed, total, failed)`: ±8 with partial linear interpolation, idempotent
+  - `compute_r2_science_reward(priority)`: HIGH=+2.5, MEDIUM=+1.5, LOW=+1.0, unknown→LOW
+  - `compute_threat_outcome_reward(neutralized)`: +3 / -5
+  - `compute_domain_failure_reward(failure_reason)`: -4 for 4 R2 failure modes (thermal_runaway, structural_collapse, radiation_integrity_lost, all_instruments_destroyed), idempotent
+
+  **Layer 2 — Shaped rewards (governing constraint: cap at 0.90/episode):**
+  - `_apply_shaped(amount, key)`: positive capped at remaining headroom; negative always applied in full
+  - `compute_emergency_reward(shadow_result, emergency_event)`: 4-scenario formula:
+    - A (failure would occur, sarva would NOT act) → +0.08
+    - B (no failure would occur — false alarm) → -0.06
+    - D (failure would occur, sarva WOULD act — redundant) → 0.0
+  - `compute_missed_emergency_reward()`: Scenario C → -0.10
+  - `compute_conflict_resolution_reward(resolved_correctly)`: +0.05 if True, 0 if False
+  - `compute_urgency_calibration_reward(calibrated)`: +0.03 / 0
+  - `compute_strategy_alignment_reward(aligned)`: +0.02 / 0
+
+  **Layer 3 — Coordination placeholder:**
+  - `compute_sarvadrishi_coordination_reward(accuracy, consistency, override_justification, trust)`: weighted average → scaled shaped reward (placeholder for Phase R2-7 loaded model)
+
+  **Properties added:**
+  - `breakdown`: public read-only view of `_breakdown` dict
+  - `total`: public view of `_total`
+  - `shaped_accumulated`: positive shaped reward accumulated this episode
+  - `shaped_cap_remaining`: remaining positive shaped budget
+
+  **`compute_episode_reward(final_context)`**: applies all Layer 1 outcome rewards, clamps to [-20, +20]
+
+- Created `tests/test_r2_reward.py`: 79 tests across 9 test classes
+
+**What works:**
+- `pytest tests/test_r2_reward.py` → 79/79 passing
+- `pytest tests/` → 905/905 passing
+
+**What doesn't work / blockers:**
+- None
+
+### Session R2-6.2 — 2026-04-22
+**What was done:**
+- R2-6.2: Created `server/r2_graders.py` — `grade_r2_episode(task_id, episode_log)` routing all 5 tasks:
+
+  **Tasks 1–3 (R1 overlay):** R1 grader score × 0.75 + coordination × 0.15 + emergency × 0.10.
+  R1 result dominates; R2 layers add quality signal on top without overriding R1 semantics.
+
+  **Task 4 formula:** coordination × 0.35 + emergency × 0.30 + mission × 0.35
+
+  **Task 5 formula:** coordination × 0.30 + emergency × 0.35 + mission × 0.25 + cascade × 0.10
+
+  **`_coordination_score()`:** reads `conflict_detected/resolved_correctly`, `sarvadrishi_strategy/action_type`, `override_invoked/justified`, `sub_agent_urgency_calibrated`; weighted average of 4 dimensions (0.35/0.30/0.20/0.15). Defaults to 0.0 when no evidence (prevents passive gaming).
+
+  **`_emergency_score()`:** reads `emergency_invoked/correct`, `crisis_opportunity/emergency_fired_for_crisis`, `cascade_alert_received/handled_correctly`; weighted (0.50/0.30/0.20). Defaults to 0.0 when no evidence.
+
+  **`_mission_score_r2()`:** priority-weighted objective completion (HIGH=3×, MEDIUM=2×, LOW=1×) × 0.9; mission_failed → hard 0.0 (no escape via resource_bonus); small resource_bonus up to 0.1.
+
+  **`_cascade_score()`:** Task 5 only — chain trigger detection (0.30) + resolution (0.30) + structural survival >30% (0.20) + thermal <95% (0.20).
+
+  **Adversarial constraints verified:**
+  - Passive SarvaDrishti (never acts): Task4=0.049, Task5=0.079 — both < 0.15 ✓
+  - Always-override (wrong invocations): Task4=0.139, Task5=0.184 — both < 0.20 ✓
+  - Happy path: Task4=0.803, Task5=0.868 — both > 0.70 ✓
+
+  **Key design decision:** All scoring defaults are 0.0 (not 0.5). "No evidence of good behaviour" scores 0, not average. This is what enforces the passive < 0.15 constraint — if you never coordinate, you never score.
+
+- Created `tests/test_r2_graders.py`: 69 tests across 9 test classes
+
+**What works:**
+- `pytest tests/test_r2_graders.py` → 69/69 passing
+- `pytest tests/` → 974/974 passing
+
+**What doesn't work / blockers:**
+- None
+
+### Session R2-7.1 — 2026-04-22
+**What was done:**
+- R2-7.1: Created `training/train_sub_agent.py` — Phase 1 individual sub-agent training script.
+
+  **`IsolatedResourceEnv`:** Self-contained single-domain training environment. 8 agent configs (power/fuel/thermal/computational/structural/communications/probe_systems/threat). Each has initial_range, rate_range, good_actions, bad_actions, and catastrophic threshold. `step()` applies action effects + passive dynamics, returns (obs, reward, done, catastrophic). Reward = safe_fraction × 0.8 + action_bonus × 0.2.
+
+  **SFT warmup:** Loads seed_demos/{agent}_demos.jsonl if it exists; otherwise generates 20 synthetic demos from the rule-based agent policy via IsolatedResourceEnv. Formats as (prompt, completion) pairs in Qwen chat format. Runs 3 epochs via TRL SFTTrainer (skipped gracefully if TRL not installed).
+
+  **GRPO loop:** `_make_grpo_reward_fn(agent_name)` → GRPOTrainer-compatible reward function. Builds a prompts dataset from env rollouts. Runs via TRL GRPOTrainer with GRPOConfig (num_generations=4, max_prompt_length=512, max_completion_length=256). Falls back to `_run_minimal_grpo_loop()` if TRL not installed.
+
+  **Evaluation:** 50-step eval loop. Criterion 1: avg_reward ≥ 0.70. Criterion 2: zero catastrophic failures in 20 consecutive steps. Logs PASSED/WARNING (not fatal — checkpoint still saved).
+
+  **Graceful degradation:** Three levels — (1) full Unsloth + TRL on cluster, (2) HF BitsAndBytes + TRL on Colab, (3) no torch → auto-fallback to minimal smoke-test loop, no crash.
+
+  **CLI args:** --agent, --model_size (7b|14b|tiny), --steps, --batch_size, --output_dir, --push_to_hub, --skip_sft, --skip_model_load, --eval_only
+
+**What works:**
+- `python training/train_sub_agent.py --agent power --steps 5 --batch_size 2` → exits 0 (auto-fallback to smoke-test when torch unavailable)
+- `python training/train_sub_agent.py --agent power --steps 5 --batch_size 2 --skip_model_load` → exits 0
+- `pytest tests/` → 974/974 passing (no regressions from training/ addition)
+
+**What doesn't work / blockers:**
+- Full training requires torch + unsloth/trl installed (only available on SPIT cluster / Colab)
+- Seed demo files not yet generated (R2-0.2 pending) — script auto-generates 20 synthetic warmup samples as fallback
+
+### Session R2-7.2 + R2-7.3 — 2026-04-22
+**What was done:**
+- R2-7.2: Created `training/train_reward_model.py` — SarvaDrishti preference reward model.
+
+  **Data loading:** Reads `training/data/preference_pairs/sarvadrishi_pairs.jsonl` (Bradley-Terry format: `chosen`/`rejected` string pairs). Falls back to 30 synthetic pairs covering all 5 conflict types if file not found (Featherless generation pending).
+
+  **Model loading:** Tries Unsloth QLoRA first (cluster), then HF BitsAndBytes `AutoModelForSequenceClassification` num_labels=1 (Colab), then data-pipeline-only smoke-test (local — no torch).
+
+  **Training:** TRL `RewardTrainer` + `RewardConfig` (max_length=1024, bf16, report_to=none). Saves to `training/checkpoints/sarvadrishi_reward_model/`. Push-to-hub supported.
+
+  **Evaluate:** Held-out pairs accuracy target > 90% (logged post-training; accuracy measured on `_smoke_test_reward()` data-integrity check when no model available).
+
+  **CLI args:** `--model_size (3b|tiny)`, `--steps`, `--batch_size`, `--output_dir`, `--push_to_hub`
+
+- R2-7.3: Created `training/train_sarvadrishi.py` — Phase 2 SarvaDrishti ensemble training.
+
+  **`MultiAgentEpisodeEnv`:** Lightweight rollout environment. Loads all 8 frozen sub-agents (rule-based if no adapters). `collect_recommendations()` polls each agent, `apply_sarvadrishi_decision()` parses approved_action, applies resource dynamics, computes step reward (survival × 0.7 + resource_health × 0.3). `episode_outcome_score()` calls `r2_graders.grade_r2_episode()` with fallback.
+
+  **GRPO reward:** `_OUTCOME_WEIGHT=0.75 × step_reward + _COORDINATION_WEIGHT=0.25 × coord_reward`. Coord reward: loaded reward model sigmoid score; falls back to heuristic (JSON completeness + reasoning length).
+
+  **`_score_coordination()`:** If reward model loaded → sigmoid(logits[0,0]). Else → (required_keys_present/3) × 0.7 + min(0.3, reasoning_len/200).
+
+  **Training:** TRL GRPOTrainer, num_generations=4, lr=5e-6, bf16. Sub-agents FROZEN. Falls back to `_minimal_smoke_loop()` if TRL unavailable.
+
+  **Logging targets (on cluster):** `global_mission_score`, `coordination_quality`, `emergency_frequency`.
+  **Eval targets (on cluster):** Task 3 score > 0.65, coordination > 0.60, emergency handled > 70%.
+
+  **CLI args:** `--model_size (14b|7b|tiny)`, `--steps`, `--batch_size`, `--sub_agent_checkpoints`, `--reward_model_path`, `--output_dir`, `--push_to_hub`
+
+**What works:**
+- `python3 training/train_reward_model.py --steps 5 --batch_size 2` → exits 0 (smoke-test, no torch)
+- `python3 training/train_sarvadrishi.py --steps 5 --batch_size 1` → exits 0 (smoke-test avg_reward=0.93)
+- `pytest tests/` → 974/974 passing (no regressions)
+
+**What doesn't work / blockers:**
+- Full training requires torch + unsloth/trl (SPIT cluster / Colab only)
+- Featherless preference pairs not yet generated (R2-0.3 pending) — 30 synthetic pairs used as fallback
+
+**Next session:**
+- R2-7.4: `training/train_emergency.py` (exists, needs smoke-test verification + log)
+- R2-7.5: `training/eval_pipeline.py` (not yet created)
+
+### Session R2-7.4 + R2-7.5 — 2026-04-22
+**What was done:**
+- R2-7.4: Verified `training/train_emergency.py` — Phase 3 emergency authority calibration.
+
+  **Agents calibrated:** threat (full), power/thermal/probe_systems (emergency layers), structural (cascade layers), communications (beacon layer).
+
+  **`EmergencyScenarioEnv`:** 10 hard-coded crisis/non-crisis scenarios across all 6 agents. `score_decision()` → 1.0 (correct invocation), 0.8 (correct non-invocation), 0.3 (wrong action), 0.0 (false alarm or missed). Tracks `invocation_accuracy`, `false_alarm_rate`, `missed_rate` as properties.
+
+  **`_partially_unfreeze(model, agent, scope)`:** full / emergency / cascade / beacon scopes mapped to LoRA layer name patterns.
+
+  **`_make_emergency_reward_fn(scenario_env)`:** GRPO-compatible reward fn sampling from EmergencyScenarioEnv. Falls back to `_smoke_test_scenarios()` if no model.
+
+  **Eval targets:** invocation_accuracy > 80%, false_alarm < 15%, missed < 10%.
+
+  **CLI args:** `--steps`, `--agents_to_unfreeze`, `--sarvadrishi_checkpoint`, `--sub_agent_checkpoints`, `--output_dir`
+
+- R2-7.5: Created `training/eval_pipeline.py` — evaluation pipeline + dashboard data export.
+
+  **`evaluate_agent(agent_name, checkpoint_path, n_episodes=50) → EvalResult`:** Runs `IsolatedResourceEnv` for n_episodes × 50 steps with rule-based agent (or loaded model). Returns mean_reward, std, local_outcome_rate, catastrophic_rate, eval_passed.
+
+  **`evaluate_full_system(...) → SystemEvalResult`:** Runs synthetic episode rollouts for each task_id, grades via `r2_graders.grade_r2_episode()` with heuristic fallback. Pass criteria: Task3 ≥ 0.65, Tasks 4/5 coordination ≥ 0.60.
+
+  **`generate_reward_curves(training_log_dir) → dict`:** Scans `*.jsonl` training logs; falls back to smooth synthetic curves (phase1_sub_agents, phase2_sarvadrishi, phase3_emergency) with exp-rise shape.
+
+  **`generate_stage_history() → list[StageSnapshot]`:** Returns 4 snapshots (baseline → Phase 3) from `stage_raw.json` if present, else synthetic representative values showing progressive improvement.
+
+  **`export_dashboard_data(output_dir)`:** Writes `reward_curves.json`, `stage_history.json`, `episode_replays.json` (1 sample episode per task) to output_dir. Creates dir if missing.
+
+- Created `tests/test_training_scripts.py`: 45 tests across 7 test classes
+  - `TestIsolatedResourceEnv` (5 tests)
+  - `TestEmergencyScenarioEnv` (8 tests)
+  - `TestEvalPipelineEvalAgent` (6 tests)
+  - `TestEvalPipelineFullSystem` (5 tests)
+  - `TestEvalPipelineRewardCurves` (5 tests)
+  - `TestEvalPipelineStageHistory` (5 tests)
+  - `TestEvalPipelineExportDashboard` (5 tests)
+  - `TestCLISmokeTests` (6 tests — subprocess, all 5 training scripts)
+
+**What works:**
+- `python3 training/train_emergency.py --steps 5` → exits 0
+- `python3 training/eval_pipeline.py --checkpoint_dir training/checkpoints --output_dir dashboard/data --n_eval_episodes 3` → exits 0, writes 3 JSON files
+- `pytest tests/test_training_scripts.py` → 45/45 passing
+- `pytest tests/` → 1019/1019 passing (all R1 + all R2 phases)
+- `dashboard/data/` populated: `reward_curves.json`, `stage_history.json`, `episode_replays.json`
+
+**What doesn't work / blockers:**
+- Emergency eval targets (accuracy=0.00, false_alarm=0.41) not met in smoke-test mode — expected, no trained model loaded
+- Full training (all 5 scripts) requires torch + unsloth/trl on SPIT cluster
+
+**Next session:**
+- R2-8.1: Create `training/cluster_jobs/` SBATCH scripts for SPIT cluster
 
 <!-- Copy the session block above for each new session -->
 

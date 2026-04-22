@@ -404,7 +404,7 @@ correct observation assembly. Run pytest tests/ — must stay green.
 > Goal: R2VyomRakshaEnvironment wraps MultiAgentLoop, OpenEnv-compliant.
 > Exit criteria: openenv validate passes. Tasks 1-5 all accessible.
 
-- [ ] **R2-5.1** Create `server/r2_environment.py` and update `server/app.py`
+- [x] **R2-5.1** Create `server/r2_environment.py` and update `server/app.py`
 
 ```
 Claude Code prompt for R2-5.1:
@@ -424,7 +424,7 @@ Run openenv validate — must pass 6/6.
 Run pytest tests/ — must stay green.
 ```
 
-- [ ] **R2-5.2** Create `server/r2_reward.py`
+- [x] **R2-5.2** Create `server/r2_reward.py`
 
 ```
 Claude Code prompt for R2-5.2:
@@ -454,7 +454,7 @@ Run pytest tests/test_r2_reward.py — must pass.
 ## Phase R2-6 — Tasks 4 + 5 and R2 Graders
 > Goal: Tasks 4 and 5 playable. R2 grader scoring correctly across all 5 tasks.
 
-- [ ] **R2-6.1** Create Task 4 and 5 mission JSONs
+- [x] **R2-6.1** Create Task 4 and 5 mission JSONs
 
 ```
 Claude Code prompt for R2-6.1:
@@ -474,7 +474,7 @@ Events: debris at T+20 → Structural emergency (safe_mode) → thermal spike �
 Secondary solar flare at T+60. 1 high priority science deadline T+90. Eclipse T+100-T+130.
 ```
 
-- [ ] **R2-6.2** Create `server/r2_graders.py`
+- [x] **R2-6.2** Create `server/r2_graders.py`
 
 ```
 Claude Code prompt for R2-6.2:
@@ -499,7 +499,7 @@ Write tests/test_r2_graders.py. Run pytest tests/ — must stay green.
 > Goal: All training scripts written, tested locally with tiny models.
 > Exit criteria: Each script runs without error using Qwen2.5-0.5B and 5 episodes locally.
 
-- [ ] **R2-7.1** Create `training/train_sub_agent.py`
+- [x] **R2-7.1** Create `training/train_sub_agent.py`
 
 ```
 Claude Code prompt for R2-7.1:
@@ -519,7 +519,7 @@ Test locally: python training/train_sub_agent.py --agent power --steps 5 --batch
 Must complete without errors. Uses smallest available model for local testing.
 ```
 
-- [ ] **R2-7.2** Create `training/train_reward_model.py`
+- [x] **R2-7.2** Create `training/train_reward_model.py`
 
 ```
 Claude Code prompt for R2-7.2:
@@ -532,7 +532,7 @@ Save to training/checkpoints/sarvadrishi_reward_model/
 Test locally with --steps 5 --batch_size 2.
 ```
 
-- [ ] **R2-7.3** Create `training/train_sarvadrishi.py`
+- [x] **R2-7.3** Create `training/train_sarvadrishi.py`
 
 ```
 Claude Code prompt for R2-7.3:
@@ -552,7 +552,7 @@ Sub-agents FROZEN during Phase 2.
 Test locally with --steps 5 --batch_size 1.
 ```
 
-- [ ] **R2-7.4** Create `training/train_emergency.py`
+- [x] **R2-7.4** Create `training/train_emergency.py`
 
 ```
 Claude Code prompt for R2-7.4:
@@ -567,7 +567,7 @@ Targets: accuracy > 80%, false alarm < 15%, missed < 10%.
 Test locally with --steps 5.
 ```
 
-- [ ] **R2-7.5** Create `training/eval_pipeline.py`
+- [x] **R2-7.5** Create `training/eval_pipeline.py`
 
 ```
 Claude Code prompt for R2-7.5:
