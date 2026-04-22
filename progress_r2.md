@@ -8,9 +8,9 @@
 
 ## Current Status
 
-**Overall phase:** R2 IMPLEMENTATION IN PROGRESS — Phase R2-2 complete.
+**Overall phase:** R2 IMPLEMENTATION IN PROGRESS — Phase R2-4 complete.
 **Last updated:** 2026-04-22
-**Next session must start at:** Phase R2-3 — Sub-Agents (base_agent.py + 8 individual agents). See r2_todo.md Phase R2-3.
+**Next session must start at:** Phase R2-5 — R2 Environment + Reward (`r2_environment.py`, `app.py` update, `r2_reward.py`). See r2_todo.md R2-5.1.
 
 ---
 
@@ -254,7 +254,117 @@
 - None
 
 **Next session:**
-- Phase R2-4.1: `server/orchestrator/conflict_resolver.py` + `strategy_manager.py`
+- Phase R2-4.2: `server/orchestrator/emergency_handler.py` + `server/shadow_sim.py`
+
+---
+
+### Session R2-4.1 — 2026-04-22
+**What was done:**
+- R2-4.1: Created `server/orchestrator/__init__.py` (empty), `conflict_resolver.py`, `strategy_manager.py`
+
+  **ConflictResolver:**
+  - `detect_conflicts()`: scans all recommendation pairs for Types 1/2/4; deduplicates by (type, frozenset(agents))
+  - Type 1 (resource): detects shared `affected_resources` + different actions
+  - Type 2 (exclusivity): detects mutually exclusive actions via 6 exclusivity groups
+  - Type 4 (strategic vs local): detects urgency gap > 4× tiebreak threshold with one agent ≥ 0.75 and other < 0.40
+  - `resolve()`: processes conflicts sorted by type; first decisive action wins
+  - Type 1 resolution: higher urgency wins by > 0.05; otherwise strategy tiebreaker via `_STRATEGY_ACTION_AFFINITY`
+  - Type 2 resolution: `_IRREVERSIBILITY_RANK` dict (21 actions ranked 0–20); lowest rank wins
+  - Type 3 resolution: `_strategy_aligned_rec()` picks action matching strategy affinity keywords
+  - Type 4 resolution: urgency ≥ 0.75 overrides strategy; < 0.40 always defers to strategy
+  - Type 5 resolution: urgency ≥ 0.85 overrides Earth directive; otherwise directive wins
+
+  **StrategyManager:**
+  - `update_strategy_reactive()`: emergency_triggered → emergency_survival; urgency alert ≥ 0.75 → domain-mapped strategy; urgency ≥ 0.90 always → emergency_survival
+  - `update_strategy_proactive()`: fires every PROACTIVE_UPDATE_INTERVAL=5 steps; decision tree on resource snapshot (power<25/thermal>80/structural<40 → emergency; fuel<20/power<40/compute<30 → conservation; healthy → maximize_science or long_horizon)
+  - `get_priority_weights()`: returns copy of weight dict for current strategy; all 5 strategies have weights summing to 1.0
+  - Created `tests/test_orchestrator.py`: 64 tests across 14 test classes
+
+**What works:**
+- `pytest tests/test_orchestrator.py` → 64/64 passing
+- `pytest tests/` → 686/686 passing
+
+**What doesn't work / blockers:**
+- None
+
+**Next session:**
+- Phase R2-4.2: `emergency_handler.py` + `shadow_sim.py`
+
+### Session R2-4.2 — 2026-04-22
+**What was done:**
+- R2-4.2: Created `server/orchestrator/emergency_handler.py` and `server/shadow_sim.py`
+
+  **EmergencyHandler:**
+  - `EmergencyEvent` dataclass: agent_id, action, priority, domain_state snapshot
+  - `EmergencyResult` dataclass: event, delta, success, error, resource_state_after
+  - `_priority(agent_id)`: maps agent to index in EMERGENCY_PRIORITY_ORDER; unknown agents get lowest priority (len(list))
+  - `scan(sub_agents)`: polls `check_emergency()` on all agents with `has_emergency_authority=True`; builds EmergencyEvent per fired agent
+  - `resolve_simultaneous(events)`: picks winner by min priority (Structural > Power > Thermal > Probe Systems > Communications > Threat); logs deferred events
+  - `execute(event, probe_sim)`: calls `apply_r2_action(action, {})` on probe sim; captures resource snapshot after execution
+  - `build_post_emergency_notification(result)`: assembles full notification dict for SarvaDrishti with agent, action, success, deltas, post-state, priority, domain_state_at_trigger
+
+  **ShadowSimulator:**
+  - `ShadowResult` dataclass: resource_failure_occurred, sarvadrishi_would_have_acted, outcome_delta, trajectory, failure_step
+  - `run()`: deep-copies simulator, advances latency_steps with passive auto-recovery + guard rails only (no active actions = worst-case counterfactual), tracks failure step and urgency threshold crossings
+  - `_urgency_above_threshold(snap)`: checks all 6 resource dimensions against URGENCY_STRATEGY_OVERRIDE_THRESHOLD (0.75); thermal uses inverted scale (value/100), others use 1-value/100
+  - `outcome_delta`: actual post-emergency state minus shadow end-state (positive = emergency made it better)
+
+- Created `tests/test_emergency_handler.py`: 57 tests across 7 test classes covering scan, resolve, execute, notification, priority helper, shadow run, urgency heuristic
+- Fixed 3 test issues: thermal failure tests needed `initial_thermal=100.0` (not 95.0 threshold exactly, since passive dissipation reduces it below threshold before guard rails fire); thermal urgency test needed `76.0` (urgency = value/100 ≥ 0.75 requires ≥ 75.0)
+
+**What works:**
+- `pytest tests/test_emergency_handler.py` → 57/57 passing
+- `pytest tests/` → 743/743 passing
+
+**What doesn't work / blockers:**
+- None
+
+**Next session:**
+- Phase R2-5.1: `server/r2_environment.py` + update `server/app.py`
+
+---
+
+### Session R2-4.3 — 2026-04-22
+**What was done:**
+- R2-4.3: `server/orchestrator/sarvadrishi.py` and `server/multi_agent_loop.py` were already scaffolded from a previous session. This session fixed two Pydantic validation bugs that were causing all 28 `run_step` tests to fail:
+
+  **Bug 1 — Wrong R2ProbeObservation field names in `_build_observation()`:**
+  - `multi_agent_loop.py` was passing `power=`, `fuel=`, `time=` (R2 simulator attribute names) to `R2ProbeObservation`, which inherits from `ProbeObservation` with required fields `power_level`, `fuel_remaining`, `time_remaining`.
+  - Fixed by renaming to the canonical base-class field names.
+
+  **Bug 2 — Forbidden extra fields violating `extra="forbid"` on the openenv `Observation` base:**
+  - `episode_done`, `mission_failed`, `failure_reason`, `stalling`, `consecutive_defers` were passed as top-level kwargs — all forbidden.
+  - Fixed: `episode_done` → `done`; others folded into `metadata` dict (a base-class field).
+
+  **`models_r2.py` — Added convenience `@property` aliases on `R2ProbeObservation`:**
+  - `power`, `fuel`, `time` → proxy `power_level`, `fuel_remaining`, `time_remaining`
+  - `mission_failed`, `failure_reason`, `stalling`, `consecutive_defers` → read from `metadata`
+  - Required because existing callers and tests use R2 attribute names; properties work inside Pydantic without triggering `extra="forbid"`.
+
+  **`tests/test_multi_agent_loop.py` (83 tests across 10 test classes):**
+  - `TestSarvaDrishtiInit` (5): default strategy, custom strategy, invalid raises, earth_directive, science priority
+  - `TestSarvaDrishtiDeliberate` (12): return type, approved action selection, no-recs default, weight keys/sum, emergency trigger, conflict detection, step count, urgency override, highest-urgency wins
+  - `TestSarvaDrishtiBroadcast` (7): broadcast key, strategy, weights, involved agents targeted, uninvolved excluded, targeted has strategy, empty → broadcast only
+  - `TestSarvaDrishtiScienceObjective` (4): default objective, advance, clamp at last, set_earth_directive
+  - `TestActionBelongsTo` (6): power/thermal/comms/threat mappings, unknown action, cross-domain mismatch
+  - `TestDomainStateForAgent` (7): power/thermal/structural cascade/structural no-cascade/comms bandwidth/threat sensor/unknown agent
+  - `TestGlobalSnapshot` (5): step_count, compute_available, comms_window, threat_event merge, mission_failed
+  - `TestMissionPhase` (6): nominal/emergency/critical low power/critical high thermal/degraded medium power/degraded low structural
+  - `TestMultiAgentLoopInit` (4): no error, keyed by id, custom sarvadrishi, step_count=0
+  - `TestMultiAgentLoopRunStep` (11): returns triple, reward=0, done=False, step increments, R2 fields, sarvadrishi decision, 8 recommendations, mission_phase string, power range, 5-step no crash, done on depleted sim
+  - `TestEmergencyPreDeliberation` (5): emergency_log field exists, populated on emergency, emergency phase, no log on no-fire, structural wins over power priority
+  - `TestCascadeAlerts` (2): cascade overrides stored, cleared when no threat cascade
+  - `TestObservationAssembly` (9): all R2 fields correct types, 8 agent ids match, strategy valid, threat event injected
+
+**What works:**
+- `pytest tests/test_multi_agent_loop.py` → 83/83 passing
+- `pytest tests/` → **826/826 passing** (all R1 + R2 tests)
+
+**What doesn't work / blockers:**
+- None — clean session
+
+**Next session:**
+- Phase R2-5.1: `server/r2_environment.py` + update `server/app.py`
 
 <!-- Copy the session block above for each new session -->
 
