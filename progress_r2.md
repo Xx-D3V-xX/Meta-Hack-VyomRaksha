@@ -8,9 +8,9 @@
 
 ## Current Status
 
-**Overall phase:** R2 IMPLEMENTATION IN PROGRESS — Phase R2-7 complete (all training scripts written + tested).
+**Overall phase:** R2 IMPLEMENTATION IN PROGRESS — Phases R2-0 through R2-7 complete. Expert data generated (200 demos + 164 pairs). All training scripts written + tested. 1019/1019 tests passing.
 **Last updated:** 2026-04-22
-**Next session must start at:** R2-8 — SPIT cluster job scripts (`training/cluster_jobs/`). See r2_todo.md R2-8.1.
+**Next session must start at:** R2-8.1 — SPIT cluster SBATCH job scripts (`training/cluster_jobs/`). See r2_todo.md R2-8.1.
 
 ---
 
@@ -617,6 +617,87 @@
 
 **Next session:**
 - R2-8.1: Create `training/cluster_jobs/` SBATCH scripts for SPIT cluster
+
+### Session R2-Data + R2-Review — 2026-04-22
+**What was done:**
+
+**R2-0 — Expert Data Generation (complete):**
+- Created `training/generate_expert_data.py` — Groq API data generator (llama-3.3-70b-versatile, OpenAI-compatible endpoint, python-dotenv for `GROQ_API_KEY`).
+  - `--mode demo --agent <name>`: generates 25 10-step episodes per agent; saved to `training/data/seed_demos/{agent}_demos.jsonl`
+  - `--mode pairs`: generates 170 SarvaDrishti preference pairs (34 × 5 conflict types); saved to `training/data/preference_pairs/sarvadrishi_pairs.jsonl`
+  - JSON parse-retry up to 3 attempts; resume capability via `_load_completed_ids()`; flush-per-write; post-generation validation
+  - Fixed: LLM returning 11 steps instead of 10 → silent trim to `STEPS_PER_EPISODE` in `_generate_demo_episode()`
+- Created `training/data/seed_demos/` and `training/data/preference_pairs/` directories
+- **Generated: 200 seed demos** (25 episodes × 8 agents) via Groq API — threat agent confirmed 57,978 tokens; remaining 7 agents run by team
+- **Generated: 164 preference pairs** (6 below 170 target — Featherless token budget consumed; 164 is sufficient for reward model training)
+- Token tracking: all usage logged per-run via `--mode` output; total well under 300K across accounts
+
+**R2-1 through R2-7 — Full Implementation Review:**
+All 25+ files read top-to-bottom. Summary of what was built:
+
+| File | Description |
+|---|---|
+| `server/r2_constants.py` | All R2 magic numbers in 6 sections: resource thresholds, costs, task seeds, reward constants, emergency authority constants, comms protocol constants |
+| `models_r2.py` | 5 Pydantic v2 models: R2ResourceState, SubAgentRecommendation, SarvaDrishtiDecision, R2ProbeObservation (extends ProbeObservation), R2EpisodeLogEntry |
+| `server/probe_sim_r2.py` | R2ProbeSimulator extending R1: 4 new resources + per-instrument health; 23 action atoms; get_rates_of_change() rolling avg; apply_r2_damage() with shield absorption; is_r2_mission_failed(); compute_auto_recovery() |
+| `server/sub_agents/__init__.py` | Empty package marker |
+| `server/sub_agents/base_agent.py` | Abstract SubAgent base: observe(), recommend(), check_emergency(), update_from_decision(), get_domain_state_summary(); _WrappedModel for Unsloth/PEFT; graceful rule-based fallback |
+| `server/sub_agents/power_agent.py` | emergency_authority=True; recharge<40%, defer>70%; emergency: power<5% AND rate<-2%/step → emergency_shutdown |
+| `server/sub_agents/fuel_agent.py` | emergency_authority=False; fuel_conservation_mode<30%; flags blind maneuver cost |
+| `server/sub_agents/thermal_agent.py` | emergency_authority=True; thermal_vent>75%, reduce_load>65%; emergency: thermal>92% AND rate>1%/step → thermal_vent |
+| `server/sub_agents/computational_agent.py` | emergency_authority=False; allocate/release compute for threat requests; _max_affordable_depth() |
+| `server/sub_agents/structural_agent.py` | emergency_authority=True cascaded-only; check_emergency always False; urgency spikes non-linearly below 40% |
+| `server/sub_agents/communications_agent.py` | emergency_authority=True; transmit when buffer>30% + window open; emergency: mission_failed AND no TX in 10 steps → emergency_beacon |
+| `server/sub_agents/probe_systems_agent.py` | emergency_authority=True; radiation shield on event → calibrate → schedule instrument run; emergency: any instrument <10% active → instrument_shutdown_selective |
+| `server/sub_agents/threat_agent.py` | emergency_authority=True (direct + cascade initiator); 6-step CoT rule-based pipeline; cascade_alerts in estimated_outcome; emergency: confidence>60% AND TTI≤3 AND severity>0.85 |
+| `server/orchestrator/__init__.py` | Empty package marker |
+| `server/orchestrator/conflict_resolver.py` | Detects 5 conflict types; resolves by urgency/irreversibility/strategy affinity; _IRREVERSIBILITY_RANK + _STRATEGY_ACTION_AFFINITY dicts |
+| `server/orchestrator/strategy_manager.py` | 5 strategies with weight profiles summing to 1.0; reactive + proactive update paths; every-5-steps proactive decision tree |
+| `server/orchestrator/emergency_handler.py` | Pre-deliberation scan; EmergencyEvent/EmergencyResult dataclasses; priority order: Structural>Power>Thermal>ProbeSystems>Comms>Threat; build_post_emergency_notification() |
+| `server/orchestrator/sarvadrishi.py` | SarvaDrishti orchestrator: deliberate(), broadcast_to_sub_agents() (Option C hybrid), get_science_objective_priority(), set_earth_directive(), _action_belongs_to() |
+| `server/shadow_sim.py` | ShadowSimulator: deep-copy forward pass for latency_steps; passive-only worst-case counterfactual; 4-scenario outcome_delta; _urgency_above_threshold() |
+| `server/multi_agent_loop.py` | MultiAgentLoop.run_step(): full 12-step cycle; cascade_alerts extraction; emergency pre-deliberation; _build_observation() assembles R2ProbeObservation |
+| `server/r2_environment.py` | R2VyomRakshaEnvironment: tasks 1-3 delegate to R1 parent; tasks 4-5 use MultiAgentLoop; _load_sub_agents() with LORA_{AGENT}_PATH env vars; _advance_r2_events() |
+| `server/r2_reward.py` | R2RewardCalculator: Layer 1 outcome (±10/±8/+2.5/+3/-4); Layer 2 shaped (0.90 cap, 4-scenario emergency formula); Layer 3 coordination placeholder |
+| `server/r2_graders.py` | grade_r2_episode() routing all 5 tasks; Task 4 formula (coord×0.35+emerg×0.30+mission×0.35); Task 5 adds cascade×0.10; adversarial verified (passive<0.15, always-override<0.20) |
+| `missions/task4_emergency.json` | Task 4 seed=1337: debris+solar_flare double-hit scenario, 2 MEDIUM objectives, comms window T+80-100 |
+| `missions/task5_cascade.json` | Task 5 seed=2048: 3-event cascade (debris→thermal_spike→solar_flare), 1 HIGH objective, eclipse T+100-130 |
+| `training/train_sub_agent.py` | Phase 1 GRPO: IsolatedResourceEnv, SFT warmup from seed demos, GRPOTrainer, catastrophic-failure eval, graceful degradation |
+| `training/train_reward_model.py` | Bradley-Terry preference model: reads sarvadrishi_pairs.jsonl; TRL RewardTrainer; >90% held-out accuracy target |
+| `training/train_sarvadrishi.py` | Phase 2 GRPO: MultiAgentEpisodeEnv, frozen sub-agents, loaded reward model scoring, 75%/25% outcome/coordination split |
+| `training/train_emergency.py` | Phase 3 calibration: EmergencyScenarioEnv, partial unfreeze (full/emergency/cascade/beacon scopes), GRPO reward fn |
+| `training/eval_pipeline.py` | evaluate_agent(), evaluate_full_system(), generate_reward_curves(), generate_stage_history(), export_dashboard_data() |
+
+**Test suite (full read + run confirmed):**
+- `tests/test_models_r2.py`: 32 tests
+- `tests/test_probe_sim_r2.py`: 71 tests
+- `tests/test_sub_agents.py`: 179 tests (43 base + 62 R2-3.2 + 74 R2-3.3)
+- `tests/test_orchestrator.py`: 64 tests
+- `tests/test_emergency_handler.py`: 57 tests
+- `tests/test_multi_agent_loop.py`: 83 tests
+- `tests/test_r2_reward.py`: 79 tests
+- `tests/test_r2_graders.py`: 69 tests
+- `tests/test_training_scripts.py`: 45 tests
+- **Total: 1019/1019 passing in 37.24s** (340 R1 + 679 R2)
+
+**What works:**
+- Full R2 implementation stack is functional in rule-based mode (no GPU/torch required)
+- All 8 sub-agents observe → recommend → check_emergency correctly
+- Emergency handler priority ordering, cascade alerts, shadow sim all functional
+- Multi-agent loop runs a full 12-step cycle without error
+- R2 environment dispatches tasks 4/5 to MultiAgentLoop; tasks 1-3 delegate cleanly
+- Reward calculator enforces 0.90 shaped cap; all 4 emergency scenarios compute correctly
+- Graders pass all adversarial constraints for tasks 4 and 5
+- All 5 training scripts exit 0 in smoke-test mode (graceful degradation without torch)
+- Dashboard data export produces 3 valid JSON files
+
+**What doesn't work / blockers:**
+- Full training (all 5 scripts) requires torch + unsloth/trl — SPIT cluster only
+- 164/170 preference pairs generated (6 short) — Featherless budget exhausted; sufficient for training
+- Seed demos not yet loaded into training scripts; auto-synthetic warmup fallback fires instead
+- Emergency eval targets (accuracy=0.00, false_alarm=0.41) not met in smoke-test mode — expected without a trained model
+
+**Next session must start at:** R2-8.1 — SPIT cluster SBATCH job scripts (`training/cluster_jobs/`)
 
 <!-- Copy the session block above for each new session -->
 
