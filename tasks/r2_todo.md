@@ -592,7 +592,7 @@ Run: python training/eval_pipeline.py --checkpoint_dir training/checkpoints
 > Goal: All agents trained. Reward curves generated. Before/after behavior logged.
 > Compute: SPIT cluster (both RTX Ada 6000 cards in parallel).
 
-- [ ] **R2-8.1** Submit Phase 1 sub-agent training to SPIT cluster
+- [x] **R2-8.1** Submit Phase 1 sub-agent training to SPIT cluster
 
 ```
 Claude Code prompt for R2-8.1:

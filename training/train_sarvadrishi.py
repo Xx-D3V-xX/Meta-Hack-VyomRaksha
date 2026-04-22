@@ -412,7 +412,7 @@ def _load_model_and_tokenizer(model_id: str):
             lora_alpha=_LORA_ALPHA, lora_dropout=0.05, bias="none",
             use_gradient_checkpointing="unsloth",
         )
-        return model, tokenizer
+        return model, tokenizer, True  # (model, tokenizer, is_unsloth)
 
     except ImportError:
         pass
@@ -432,7 +432,7 @@ def _load_model_and_tokenizer(model_id: str):
             lora_dropout=0.05, bias="none", task_type=TaskType.CAUSAL_LM,
         )
         model = get_peft_model(model, lora_config)
-        return model, tokenizer
+        return model, tokenizer, False  # (model, tokenizer, is_unsloth)
 
     except ImportError as exc:
         raise ImportError(
@@ -469,6 +469,7 @@ def _run_grpo_training(
     sub_agent_checkpoints: str | None,
     reward_model_path: str,
     push_to_hub: bool,
+    is_unsloth: bool = False,
 ) -> None:
     reward_model, reward_tokenizer = _load_reward_model(reward_model_path)
     reward_fn = _make_sarvadrishi_reward_fn(
@@ -525,7 +526,7 @@ def _run_grpo_training(
     except ImportError:
         log.warning("TRL GRPOTrainer unavailable — running minimal smoke-test loop")
         _minimal_smoke_loop(env, reward_fn, steps, batch_size)
-        _save_checkpoint(model, tokenizer, output_dir, push_to_hub)
+        _save_checkpoint(model, tokenizer, output_dir, push_to_hub, is_unsloth)
         return
 
     _save_checkpoint(model, tokenizer, output_dir, push_to_hub)
@@ -570,11 +571,15 @@ def _minimal_smoke_loop(
     log.info("Smoke-test complete: avg_reward=%.4f", total_reward / max(1, steps))
 
 
-def _save_checkpoint(model, tokenizer, output_dir: str, push_to_hub: bool) -> None:
+def _save_checkpoint(model, tokenizer, output_dir: str, push_to_hub: bool, is_unsloth: bool = False) -> None:
     os.makedirs(output_dir, exist_ok=True)
-    model.save_pretrained(output_dir)
+    if is_unsloth:
+        log.info("Saving SarvaDrishti adapter via Unsloth (safe_serialization=True) to %s", output_dir)
+        model.save_pretrained(output_dir, safe_serialization=True)
+    else:
+        log.info("Saving SarvaDrishti adapter via HF/BitsAndBytes to %s", output_dir)
+        model.save_pretrained(output_dir)
     tokenizer.save_pretrained(output_dir)
-    log.info("Saved SarvaDrishti adapter to %s", output_dir)
     if push_to_hub:
         try:
             model.push_to_hub("VyomRaksha-SarvaDrishti-lora")
@@ -609,7 +614,7 @@ def main() -> None:
     log.info("SarvaDrishti training: model=%s steps=%d batch=%d", model_id, args.steps, args.batch_size)
 
     try:
-        model, tokenizer = _load_model_and_tokenizer(model_id)
+        model, tokenizer, is_unsloth = _load_model_and_tokenizer(model_id)
     except ImportError as exc:
         log.warning("Model load failed (%s) — minimal smoke-test mode", exc)
         env = MultiAgentEpisodeEnv(args.sub_agent_checkpoints)
@@ -626,6 +631,7 @@ def main() -> None:
         sub_agent_checkpoints=args.sub_agent_checkpoints,
         reward_model_path=args.reward_model_path,
         push_to_hub=args.push_to_hub,
+        is_unsloth=is_unsloth,
     )
 
 
