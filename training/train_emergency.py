@@ -300,9 +300,9 @@ def _run_emergency_training(
         log.info("Phase 3 calibration: agent=%s scope=%s steps=%d", agent_name, scope, steps)
 
         try:
-            model, tokenizer = _load_agent_model(agent_name, adapter_path)
+            model, tokenizer, is_unsloth = _load_agent_model(agent_name, adapter_path)
             _partially_unfreeze(model, agent_name, scope)
-            _run_agent_grpo(model, tokenizer, agent_name, steps, reward_fn, output_dir)
+            _run_agent_grpo(model, tokenizer, agent_name, steps, reward_fn, output_dir, is_unsloth)
         except ImportError as exc:
             log.warning("No model for %s (%s) — smoke-testing scenario pipeline", agent_name, exc)
             _smoke_test_scenarios(agent_name, steps, scenario_env, reward_fn)
@@ -347,7 +347,7 @@ def _smoke_test_scenarios(
     )
 
 
-def _run_agent_grpo(model, tokenizer, agent_name: str, steps: int, reward_fn, output_dir: str) -> None:
+def _run_agent_grpo(model, tokenizer, agent_name: str, steps: int, reward_fn, output_dir: str, is_unsloth: bool = False) -> None:
     """Run GRPO for one emergency agent. Saves checkpoint on completion."""
     try:
         import datasets  # type: ignore[import]
@@ -385,9 +385,13 @@ def _run_agent_grpo(model, tokenizer, agent_name: str, steps: int, reward_fn, ou
     # Save
     save_path = os.path.join(output_dir, agent_name)
     os.makedirs(save_path, exist_ok=True)
-    model.save_pretrained(save_path)
+    if is_unsloth:
+        log.info("Saving emergency-calibrated %s via Unsloth (safe_serialization=True) to %s", agent_name, save_path)
+        model.save_pretrained(save_path, safe_serialization=True)
+    else:
+        log.info("Saving emergency-calibrated %s via HF/BitsAndBytes to %s", agent_name, save_path)
+        model.save_pretrained(save_path)
     tokenizer.save_pretrained(save_path)
-    log.info("Saved emergency-calibrated %s to %s", agent_name, save_path)
 
 
 def _load_agent_model(agent_name: str, adapter_path: str):
@@ -411,7 +415,7 @@ def _load_agent_model(agent_name: str, adapter_path: str):
                 max_seq_length=768,
                 load_in_4bit=True,
             )
-        return model, tokenizer
+        return model, tokenizer, True  # (model, tokenizer, is_unsloth)
 
     except ImportError:
         pass
@@ -424,7 +428,7 @@ def _load_agent_model(agent_name: str, adapter_path: str):
         quant = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.bfloat16)
         model = AutoModelForCausalLM.from_pretrained(src, quantization_config=quant, device_map="auto")
         tokenizer = AutoTokenizer.from_pretrained(src)
-        return model, tokenizer
+        return model, tokenizer, False  # (model, tokenizer, is_unsloth)
 
     except ImportError as exc:
         raise ImportError(f"Cannot load model for {agent_name}") from exc

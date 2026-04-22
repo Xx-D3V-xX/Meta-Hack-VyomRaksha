@@ -856,8 +856,12 @@ def _save_checkpoint(
     save_path = os.path.join(output_dir, agent_name)
     os.makedirs(save_path, exist_ok=True)
 
-    log.info("Saving LoRA adapter to %s", save_path)
-    model.save_pretrained(save_path)
+    if is_unsloth:
+        log.info("Saving LoRA adapter via Unsloth (safe_serialization=True) to %s", save_path)
+        model.save_pretrained(save_path, safe_serialization=True)
+    else:
+        log.info("Saving LoRA adapter via HF/BitsAndBytes to %s", save_path)
+        model.save_pretrained(save_path)
     tokenizer.save_pretrained(save_path)
 
     if push_to_hub:

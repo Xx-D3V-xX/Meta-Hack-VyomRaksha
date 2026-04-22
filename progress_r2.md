@@ -8,9 +8,9 @@
 
 ## Current Status
 
-**Overall phase:** R2 IMPLEMENTATION IN PROGRESS — Phases R2-0 through R2-7 complete. Expert data generated (200 demos + 164 pairs). All training scripts written + tested. 1019/1019 tests passing.
+**Overall phase:** R2 IMPLEMENTATION IN PROGRESS — R2-8.1 complete. Cluster job scripts written. Training pipeline ready to submit to SPIT cluster.
 **Last updated:** 2026-04-22
-**Next session must start at:** R2-8.1 — SPIT cluster SBATCH job scripts (`training/cluster_jobs/`). See r2_todo.md R2-8.1.
+**Next session must start at:** R2-8.2 — Submit Phase 2 SarvaDrishti training + create `phase2_sarvadrishi.sh`. See r2_todo.md R2-8.2.
 
 ---
 
@@ -698,6 +698,73 @@ All 25+ files read top-to-bottom. Summary of what was built:
 - Emergency eval targets (accuracy=0.00, false_alarm=0.41) not met in smoke-test mode — expected without a trained model
 
 **Next session must start at:** R2-8.1 — SPIT cluster SBATCH job scripts (`training/cluster_jobs/`)
+
+### Session R2-8.1 — 2026-04-22
+**What was done:**
+- Created `training/cluster_jobs/` directory with 5 SBATCH scripts:
+
+  **`phase1_card1.sh`** — Card 1 (GPU 1), sequential:
+  - `threat` — Qwen2.5-14B, 300 steps, batch_size=2 (14B needs lower batch for GRPO on 48GB)
+  - `power` — Qwen2.5-7B, 200 steps, batch_size=4
+  - `fuel` — Qwen2.5-7B, 200 steps, batch_size=4
+  - Time limit: 7 days. Estimated ~8h actual runtime.
+
+  **`phase1_card2.sh`** — Card 2 (GPU 2), sequential via loop:
+  - `thermal`, `computational`, `structural`, `communications`, `probe_systems`
+  - All Qwen2.5-7B, 200 steps, batch_size=4
+  - Time limit: 7 days. Estimated ~10h actual runtime.
+
+  **`phase1_5.sh`** — Phase 1.5 joint exposure (runs after both Card 1 and Card 2 complete):
+  - All 8 sub-agents, 200 additional GRPO steps each, `--skip_sft`
+  - Threat: 14B, batch_size=2. Others: 7B, batch_size=4.
+  - TRL GRPOTrainer resumes from Phase 1 checkpoint in `training/checkpoints/{agent}/`
+  - Time limit: 3 days. Estimated ~8h actual runtime.
+
+  **`reward_model.sh`** — SarvaDrishti preference reward model (runs after Phase 1.5):
+  - Qwen2.5-3B, 150 steps, batch_size=8
+  - Input: `training/data/preference_pairs/sarvadrishi_pairs.jsonl` (164 pairs)
+  - Output: `training/checkpoints/sarvadrishi_reward_model/`
+  - Time limit: 12h. Estimated ~2h actual runtime.
+
+  **`submit_phase1.sh`** — Convenience submission wrapper:
+  - Submits card1 and card2 in parallel immediately
+  - Submits phase1_5 with `--dependency=afterok:<CARD1>:<CARD2>`
+  - Submits reward_model with `--dependency=afterok:<PHASE15>`
+  - Prints all 4 job IDs and monitoring commands
+
+- All 4 training scripts use:
+  - `module load python/3.11.14` + `source my_env/bin/activate`
+  - `set -euo pipefail` for fail-fast on any step
+  - `PUSH_FLAG` guard: `--push_to_hub` only if `HF_TOKEN` is set
+  - `HF_HOME` and `TRANSFORMERS_CACHE` pointed to project-local `.hf_cache/`
+  - `WANDB_DISABLED=true` (no W&B dependency on cluster)
+  - `nvidia-smi` header line for per-job GPU verification
+
+**To submit from SPIT cluster:**
+```bash
+cd /path/to/Meta\ Hack
+bash training/cluster_jobs/submit_phase1.sh
+```
+Or manually:
+```bash
+mkdir -p logs
+JOB1=$(sbatch --parsable training/cluster_jobs/phase1_card1.sh)
+JOB2=$(sbatch --parsable training/cluster_jobs/phase1_card2.sh)
+sbatch --dependency=afterok:${JOB1}:${JOB2} training/cluster_jobs/phase1_5.sh
+```
+
+**What works:**
+- All 5 scripts are syntactically valid bash with proper SBATCH directives
+- Dependency chain: card1 ∥ card2 → phase1_5 → reward_model
+- HF_TOKEN guard prevents push_to_hub failures if token isn't configured
+- Scripts fail-fast on any individual agent failure (set -e)
+
+**What doesn't work / blockers:**
+- Scripts cannot be tested locally (require SPIT cluster + GPU)
+- `HF_TOKEN` must be exported in the cluster environment before submission for Hub pushes
+- `phase2_sarvadrishi.sh` (R2-8.2) not yet created — needed after reward_model completes
+
+**Next session must start at:** R2-8.2 — Create `training/cluster_jobs/phase2_sarvadrishi.sh` and `phase3_emergency.sh`, then submit Phase 2 when Phase 1.5 + reward model are done.
 
 <!-- Copy the session block above for each new session -->
 
