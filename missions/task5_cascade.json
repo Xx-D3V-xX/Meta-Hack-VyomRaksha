@@ -1,0 +1,68 @@
+{
+  "task_id": 5,
+  "seed": 2048,
+  "name": "Cascade Emergency",
+  "difficulty": "extreme",
+  "mission_window_minutes": 480,
+  "initial_power": 70.0,
+  "initial_fuel": 55.0,
+  "initial_thermal": 60.0,
+  "initial_compute": 80.0,
+  "initial_structural_integrity": 85.0,
+  "initial_data_buffer": 0.0,
+  "initial_comms_bandwidth": 100.0,
+  "initial_radiation_integrity": 100.0,
+  "objectives": [
+    {
+      "id": "rare_alignment",
+      "name": "Rare Stellar Alignment",
+      "priority": "HIGH",
+      "power_cost": 15,
+      "time_cost": 60,
+      "deadline_min": 90
+    }
+  ],
+  "comms_windows": [],
+  "eclipse_periods": [
+    {"start": 100, "end": 130}
+  ],
+  "events": [
+    {
+      "id": "debris_t20",
+      "event_type": "debris_field",
+      "detect_at": 20,
+      "impact_at": 25,
+      "intensity": 0.8,
+      "power_damage": 5.0,
+      "fuel_damage": 0.0,
+      "instrument_damage": 0.0,
+      "structural_damage": 32.0,
+      "comment": "Debris at T+20 triggers Structural emergency (safe_mode) → thermal spike from safe_mode overhead"
+    },
+    {
+      "id": "thermal_spike_t25",
+      "event_type": "solar_flare",
+      "detect_at": 22,
+      "impact_at": 28,
+      "intensity": 0.5,
+      "power_damage": 5.0,
+      "fuel_damage": 0.0,
+      "instrument_damage": 0.0,
+      "radiation_damage": 10.0,
+      "thermal_damage": 20.0,
+      "comment": "Secondary thermal spike follows structural impact; Thermal Sub-Agent emergency fires"
+    },
+    {
+      "id": "solar_flare_t60",
+      "event_type": "solar_flare",
+      "detect_at": 55,
+      "impact_at": 65,
+      "intensity": 0.75,
+      "power_damage": 18.0,
+      "fuel_damage": 0.0,
+      "instrument_damage": 0.05,
+      "radiation_damage": 22.0,
+      "comment": "Secondary solar flare at T+60 while probe is still recovering from cascade"
+    }
+  ]
+}

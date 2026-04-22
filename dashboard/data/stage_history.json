@@ -1,0 +1,38 @@
+[
+  {
+    "stage": 0,
+    "label": "Baseline (rule-based)",
+    "mean_reward": 0.21,
+    "coordination_score": 0.0,
+    "emergency_frequency": 0.05,
+    "science_yield": 0.12,
+    "threat_survival_rate": 0.58
+  },
+  {
+    "stage": 1,
+    "label": "Phase 1 (sub-agents trained)",
+    "mean_reward": 0.53,
+    "coordination_score": 0.18,
+    "emergency_frequency": 0.09,
+    "science_yield": 0.34,
+    "threat_survival_rate": 0.74
+  },
+  {
+    "stage": 2,
+    "label": "Phase 2 (SarvaDrishti ensemble)",
+    "mean_reward": 0.71,
+    "coordination_score": 0.64,
+    "emergency_frequency": 0.14,
+    "science_yield": 0.52,
+    "threat_survival_rate": 0.83
+  },
+  {
+    "stage": 3,
+    "label": "Phase 3 (emergency calibrated)",
+    "mean_reward": 0.78,
+    "coordination_score": 0.67,
+    "emergency_frequency": 0.18,
+    "science_yield": 0.58,
+    "threat_survival_rate": 0.91
+  }
+]

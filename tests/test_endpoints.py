@@ -227,16 +227,16 @@ class TestTasks:
         resp = client.get("/tasks")
         assert resp.status_code == 200
 
-    def test_tasks_returns_three_tasks(self):
+    def test_tasks_returns_five_tasks(self):
         resp = client.get("/tasks")
         data = resp.json()
         assert "tasks" in data
-        assert len(data["tasks"]) == 3
+        assert len(data["tasks"]) == 5
 
-    def test_tasks_ids_are_1_2_3(self):
+    def test_tasks_ids_are_1_through_5(self):
         resp = client.get("/tasks")
         ids = {t["id"] for t in resp.json()["tasks"]}
-        assert ids == {1, 2, 3}
+        assert ids == {1, 2, 3, 4, 5}
 
     def test_each_task_has_required_fields(self):
         resp = client.get("/tasks")
@@ -248,7 +248,7 @@ class TestTasks:
 
     def test_task_difficulties_are_valid(self):
         resp = client.get("/tasks")
-        valid = {"easy", "medium", "hard"}
+        valid = {"easy", "medium", "hard", "very_hard", "extreme"}
         for task in resp.json()["tasks"]:
             assert task["difficulty"] in valid
 

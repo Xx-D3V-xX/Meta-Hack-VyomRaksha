@@ -1,0 +1,1385 @@
+{
+  "phase1_sub_agents": [
+    {
+      "episode": 0,
+      "mean_reward": 0.2207,
+      "coordination_score": 0.1903,
+      "emergency_frequency": 0.0484,
+      "science_yield": 0.1455,
+      "threat_survival_rate": 0.5505,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 20,
+      "mean_reward": 0.2212,
+      "coordination_score": 0.2156,
+      "emergency_frequency": 0.0491,
+      "science_yield": 0.1801,
+      "threat_survival_rate": 0.5603,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 40,
+      "mean_reward": 0.2762,
+      "coordination_score": 0.2268,
+      "emergency_frequency": 0.0516,
+      "science_yield": 0.2167,
+      "threat_survival_rate": 0.5687,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 60,
+      "mean_reward": 0.2597,
+      "coordination_score": 0.2636,
+      "emergency_frequency": 0.0687,
+      "science_yield": 0.2384,
+      "threat_survival_rate": 0.5871,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 80,
+      "mean_reward": 0.2845,
+      "coordination_score": 0.2755,
+      "emergency_frequency": 0.07,
+      "science_yield": 0.2477,
+      "threat_survival_rate": 0.5769,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 100,
+      "mean_reward": 0.2914,
+      "coordination_score": 0.2812,
+      "emergency_frequency": 0.0672,
+      "science_yield": 0.2771,
+      "threat_survival_rate": 0.6037,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 120,
+      "mean_reward": 0.332,
+      "coordination_score": 0.3147,
+      "emergency_frequency": 0.0632,
+      "science_yield": 0.285,
+      "threat_survival_rate": 0.5939,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 140,
+      "mean_reward": 0.3209,
+      "coordination_score": 0.3239,
+      "emergency_frequency": 0.069,
+      "science_yield": 0.2996,
+      "threat_survival_rate": 0.6057,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 160,
+      "mean_reward": 0.3355,
+      "coordination_score": 0.3286,
+      "emergency_frequency": 0.0814,
+      "science_yield": 0.277,
+      "threat_survival_rate": 0.599,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 180,
+      "mean_reward": 0.4019,
+      "coordination_score": 0.3293,
+      "emergency_frequency": 0.0784,
+      "science_yield": 0.288,
+      "threat_survival_rate": 0.6317,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 200,
+      "mean_reward": 0.4109,
+      "coordination_score": 0.3514,
+      "emergency_frequency": 0.0716,
+      "science_yield": 0.3034,
+      "threat_survival_rate": 0.6203,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 220,
+      "mean_reward": 0.4308,
+      "coordination_score": 0.3487,
+      "emergency_frequency": 0.084,
+      "science_yield": 0.3363,
+      "threat_survival_rate": 0.6289,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 240,
+      "mean_reward": 0.4349,
+      "coordination_score": 0.376,
+      "emergency_frequency": 0.0953,
+      "science_yield": 0.339,
+      "threat_survival_rate": 0.6375,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 260,
+      "mean_reward": 0.423,
+      "coordination_score": 0.3875,
+      "emergency_frequency": 0.0867,
+      "science_yield": 0.3456,
+      "threat_survival_rate": 0.6326,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 280,
+      "mean_reward": 0.4172,
+      "coordination_score": 0.3797,
+      "emergency_frequency": 0.0943,
+      "science_yield": 0.358,
+      "threat_survival_rate": 0.6471,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 300,
+      "mean_reward": 0.42,
+      "coordination_score": 0.4104,
+      "emergency_frequency": 0.1025,
+      "science_yield": 0.3811,
+      "threat_survival_rate": 0.6687,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 320,
+      "mean_reward": 0.4766,
+      "coordination_score": 0.4243,
+      "emergency_frequency": 0.0988,
+      "science_yield": 0.3556,
+      "threat_survival_rate": 0.6702,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 340,
+      "mean_reward": 0.4467,
+      "coordination_score": 0.4266,
+      "emergency_frequency": 0.108,
+      "science_yield": 0.3918,
+      "threat_survival_rate": 0.6726,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 360,
+      "mean_reward": 0.4941,
+      "coordination_score": 0.4236,
+      "emergency_frequency": 0.103,
+      "science_yield": 0.3833,
+      "threat_survival_rate": 0.6959,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 380,
+      "mean_reward": 0.4985,
+      "coordination_score": 0.4378,
+      "emergency_frequency": 0.0986,
+      "science_yield": 0.3855,
+      "threat_survival_rate": 0.6825,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 400,
+      "mean_reward": 0.4871,
+      "coordination_score": 0.4452,
+      "emergency_frequency": 0.1049,
+      "science_yield": 0.3974,
+      "threat_survival_rate": 0.6747,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 420,
+      "mean_reward": 0.468,
+      "coordination_score": 0.4481,
+      "emergency_frequency": 0.1097,
+      "science_yield": 0.4068,
+      "threat_survival_rate": 0.681,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 440,
+      "mean_reward": 0.4686,
+      "coordination_score": 0.4487,
+      "emergency_frequency": 0.1069,
+      "science_yield": 0.3963,
+      "threat_survival_rate": 0.7204,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 460,
+      "mean_reward": 0.4965,
+      "coordination_score": 0.4522,
+      "emergency_frequency": 0.1095,
+      "science_yield": 0.4036,
+      "threat_survival_rate": 0.7153,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 480,
+      "mean_reward": 0.5032,
+      "coordination_score": 0.4445,
+      "emergency_frequency": 0.1194,
+      "science_yield": 0.4278,
+      "threat_survival_rate": 0.6995,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 500,
+      "mean_reward": 0.4739,
+      "coordination_score": 0.4708,
+      "emergency_frequency": 0.1187,
+      "science_yield": 0.3795,
+      "threat_survival_rate": 0.7134,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 520,
+      "mean_reward": 0.5243,
+      "coordination_score": 0.4731,
+      "emergency_frequency": 0.1185,
+      "science_yield": 0.4006,
+      "threat_survival_rate": 0.7161,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 540,
+      "mean_reward": 0.4952,
+      "coordination_score": 0.4475,
+      "emergency_frequency": 0.1339,
+      "science_yield": 0.3987,
+      "threat_survival_rate": 0.7262,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 560,
+      "mean_reward": 0.513,
+      "coordination_score": 0.443,
+      "emergency_frequency": 0.126,
+      "science_yield": 0.4395,
+      "threat_survival_rate": 0.734,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 580,
+      "mean_reward": 0.5071,
+      "coordination_score": 0.4733,
+      "emergency_frequency": 0.1438,
+      "science_yield": 0.4376,
+      "threat_survival_rate": 0.7398,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 600,
+      "mean_reward": 0.5286,
+      "coordination_score": 0.4851,
+      "emergency_frequency": 0.1312,
+      "science_yield": 0.4252,
+      "threat_survival_rate": 0.7738,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 620,
+      "mean_reward": 0.5112,
+      "coordination_score": 0.4586,
+      "emergency_frequency": 0.1449,
+      "science_yield": 0.4131,
+      "threat_survival_rate": 0.754,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 640,
+      "mean_reward": 0.5212,
+      "coordination_score": 0.467,
+      "emergency_frequency": 0.1474,
+      "science_yield": 0.4189,
+      "threat_survival_rate": 0.7665,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 660,
+      "mean_reward": 0.5165,
+      "coordination_score": 0.486,
+      "emergency_frequency": 0.144,
+      "science_yield": 0.4237,
+      "threat_survival_rate": 0.7615,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 680,
+      "mean_reward": 0.5414,
+      "coordination_score": 0.4677,
+      "emergency_frequency": 0.1429,
+      "science_yield": 0.4084,
+      "threat_survival_rate": 0.7776,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 700,
+      "mean_reward": 0.5559,
+      "coordination_score": 0.4699,
+      "emergency_frequency": 0.1508,
+      "science_yield": 0.4145,
+      "threat_survival_rate": 0.8129,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 720,
+      "mean_reward": 0.5384,
+      "coordination_score": 0.4822,
+      "emergency_frequency": 0.1623,
+      "science_yield": 0.4176,
+      "threat_survival_rate": 0.7986,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 740,
+      "mean_reward": 0.5409,
+      "coordination_score": 0.4587,
+      "emergency_frequency": 0.1548,
+      "science_yield": 0.4156,
+      "threat_survival_rate": 0.7986,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 760,
+      "mean_reward": 0.5415,
+      "coordination_score": 0.4751,
+      "emergency_frequency": 0.1715,
+      "science_yield": 0.4307,
+      "threat_survival_rate": 0.8126,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 780,
+      "mean_reward": 0.5287,
+      "coordination_score": 0.4892,
+      "emergency_frequency": 0.1654,
+      "science_yield": 0.4374,
+      "threat_survival_rate": 0.8049,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 800,
+      "mean_reward": 0.5325,
+      "coordination_score": 0.4725,
+      "emergency_frequency": 0.1632,
+      "science_yield": 0.4302,
+      "threat_survival_rate": 0.8295,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 820,
+      "mean_reward": 0.5405,
+      "coordination_score": 0.4934,
+      "emergency_frequency": 0.1807,
+      "science_yield": 0.4291,
+      "threat_survival_rate": 0.8295,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 840,
+      "mean_reward": 0.5359,
+      "coordination_score": 0.4964,
+      "emergency_frequency": 0.1835,
+      "science_yield": 0.449,
+      "threat_survival_rate": 0.8315,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 860,
+      "mean_reward": 0.5687,
+      "coordination_score": 0.4902,
+      "emergency_frequency": 0.1707,
+      "science_yield": 0.4446,
+      "threat_survival_rate": 0.8705,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 880,
+      "mean_reward": 0.5337,
+      "coordination_score": 0.4928,
+      "emergency_frequency": 0.1783,
+      "science_yield": 0.4145,
+      "threat_survival_rate": 0.8667,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 900,
+      "mean_reward": 0.5106,
+      "coordination_score": 0.4993,
+      "emergency_frequency": 0.1856,
+      "science_yield": 0.4082,
+      "threat_survival_rate": 0.8498,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 920,
+      "mean_reward": 0.5501,
+      "coordination_score": 0.502,
+      "emergency_frequency": 0.1836,
+      "science_yield": 0.4616,
+      "threat_survival_rate": 0.856,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 940,
+      "mean_reward": 0.5631,
+      "coordination_score": 0.4835,
+      "emergency_frequency": 0.1826,
+      "science_yield": 0.42,
+      "threat_survival_rate": 0.8771,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 960,
+      "mean_reward": 0.56,
+      "coordination_score": 0.5027,
+      "emergency_frequency": 0.1867,
+      "science_yield": 0.4352,
+      "threat_survival_rate": 0.892,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 980,
+      "mean_reward": 0.5339,
+      "coordination_score": 0.5036,
+      "emergency_frequency": 0.1926,
+      "science_yield": 0.4056,
+      "threat_survival_rate": 0.8746,
+      "phase": "phase1_sub_agents"
+    },
+    {
+      "episode": 1000,
+      "mean_reward": 0.5544,
+      "coordination_score": 0.4916,
+      "emergency_frequency": 0.2089,
+      "science_yield": 0.4612,
+      "threat_survival_rate": 0.9164,
+      "phase": "phase1_sub_agents"
+    }
+  ],
+  "phase2_sarvadrishi": [
+    {
+      "episode": 0,
+      "mean_reward": 0.4925,
+      "coordination_score": 0.478,
+      "emergency_frequency": 0.054,
+      "science_yield": 0.4253,
+      "threat_survival_rate": 0.5585,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 30,
+      "mean_reward": 0.5603,
+      "coordination_score": 0.4881,
+      "emergency_frequency": 0.0504,
+      "science_yield": 0.4312,
+      "threat_survival_rate": 0.5453,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 60,
+      "mean_reward": 0.5563,
+      "coordination_score": 0.4763,
+      "emergency_frequency": 0.049,
+      "science_yield": 0.4308,
+      "threat_survival_rate": 0.5756,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 90,
+      "mean_reward": 0.5779,
+      "coordination_score": 0.5019,
+      "emergency_frequency": 0.0614,
+      "science_yield": 0.4243,
+      "threat_survival_rate": 0.5576,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 120,
+      "mean_reward": 0.6064,
+      "coordination_score": 0.5113,
+      "emergency_frequency": 0.0599,
+      "science_yield": 0.4649,
+      "threat_survival_rate": 0.5697,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 150,
+      "mean_reward": 0.5879,
+      "coordination_score": 0.5199,
+      "emergency_frequency": 0.056,
+      "science_yield": 0.4522,
+      "threat_survival_rate": 0.5859,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 180,
+      "mean_reward": 0.5743,
+      "coordination_score": 0.5362,
+      "emergency_frequency": 0.0646,
+      "science_yield": 0.4749,
+      "threat_survival_rate": 0.576,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 210,
+      "mean_reward": 0.6346,
+      "coordination_score": 0.548,
+      "emergency_frequency": 0.0778,
+      "science_yield": 0.5166,
+      "threat_survival_rate": 0.5927,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 240,
+      "mean_reward": 0.618,
+      "coordination_score": 0.5653,
+      "emergency_frequency": 0.0725,
+      "science_yield": 0.4835,
+      "threat_survival_rate": 0.6154,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 270,
+      "mean_reward": 0.6514,
+      "coordination_score": 0.5818,
+      "emergency_frequency": 0.0795,
+      "science_yield": 0.4948,
+      "threat_survival_rate": 0.632,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 300,
+      "mean_reward": 0.644,
+      "coordination_score": 0.5547,
+      "emergency_frequency": 0.0717,
+      "science_yield": 0.5235,
+      "threat_survival_rate": 0.6024,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 330,
+      "mean_reward": 0.6134,
+      "coordination_score": 0.5744,
+      "emergency_frequency": 0.0834,
+      "science_yield": 0.5112,
+      "threat_survival_rate": 0.6265,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 360,
+      "mean_reward": 0.6547,
+      "coordination_score": 0.5918,
+      "emergency_frequency": 0.0845,
+      "science_yield": 0.5118,
+      "threat_survival_rate": 0.6535,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 390,
+      "mean_reward": 0.6414,
+      "coordination_score": 0.6013,
+      "emergency_frequency": 0.0876,
+      "science_yield": 0.5161,
+      "threat_survival_rate": 0.6236,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 420,
+      "mean_reward": 0.6833,
+      "coordination_score": 0.6034,
+      "emergency_frequency": 0.1001,
+      "science_yield": 0.5263,
+      "threat_survival_rate": 0.6551,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 450,
+      "mean_reward": 0.6439,
+      "coordination_score": 0.596,
+      "emergency_frequency": 0.0891,
+      "science_yield": 0.5059,
+      "threat_survival_rate": 0.6729,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 480,
+      "mean_reward": 0.6546,
+      "coordination_score": 0.5903,
+      "emergency_frequency": 0.092,
+      "science_yield": 0.53,
+      "threat_survival_rate": 0.6639,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 510,
+      "mean_reward": 0.6552,
+      "coordination_score": 0.628,
+      "emergency_frequency": 0.1107,
+      "science_yield": 0.5198,
+      "threat_survival_rate": 0.6652,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 540,
+      "mean_reward": 0.691,
+      "coordination_score": 0.6273,
+      "emergency_frequency": 0.1039,
+      "science_yield": 0.5692,
+      "threat_survival_rate": 0.6689,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 570,
+      "mean_reward": 0.684,
+      "coordination_score": 0.6156,
+      "emergency_frequency": 0.1104,
+      "science_yield": 0.5294,
+      "threat_survival_rate": 0.6874,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 600,
+      "mean_reward": 0.6707,
+      "coordination_score": 0.6125,
+      "emergency_frequency": 0.1193,
+      "science_yield": 0.574,
+      "threat_survival_rate": 0.7027,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 630,
+      "mean_reward": 0.663,
+      "coordination_score": 0.6077,
+      "emergency_frequency": 0.1081,
+      "science_yield": 0.5697,
+      "threat_survival_rate": 0.7107,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 660,
+      "mean_reward": 0.6988,
+      "coordination_score": 0.6332,
+      "emergency_frequency": 0.1221,
+      "science_yield": 0.5291,
+      "threat_survival_rate": 0.6874,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 690,
+      "mean_reward": 0.7188,
+      "coordination_score": 0.6086,
+      "emergency_frequency": 0.1135,
+      "science_yield": 0.5298,
+      "threat_survival_rate": 0.6916,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 720,
+      "mean_reward": 0.7198,
+      "coordination_score": 0.6225,
+      "emergency_frequency": 0.1152,
+      "science_yield": 0.5383,
+      "threat_survival_rate": 0.7242,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 750,
+      "mean_reward": 0.7297,
+      "coordination_score": 0.6316,
+      "emergency_frequency": 0.133,
+      "science_yield": 0.5614,
+      "threat_survival_rate": 0.728,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 780,
+      "mean_reward": 0.7145,
+      "coordination_score": 0.6456,
+      "emergency_frequency": 0.1332,
+      "science_yield": 0.5924,
+      "threat_survival_rate": 0.7419,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 810,
+      "mean_reward": 0.7301,
+      "coordination_score": 0.6234,
+      "emergency_frequency": 0.1317,
+      "science_yield": 0.5705,
+      "threat_survival_rate": 0.752,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 840,
+      "mean_reward": 0.7066,
+      "coordination_score": 0.6485,
+      "emergency_frequency": 0.1318,
+      "science_yield": 0.5713,
+      "threat_survival_rate": 0.7601,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 870,
+      "mean_reward": 0.7272,
+      "coordination_score": 0.6447,
+      "emergency_frequency": 0.127,
+      "science_yield": 0.5484,
+      "threat_survival_rate": 0.7533,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 900,
+      "mean_reward": 0.6962,
+      "coordination_score": 0.6225,
+      "emergency_frequency": 0.1472,
+      "science_yield": 0.5953,
+      "threat_survival_rate": 0.7521,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 930,
+      "mean_reward": 0.7069,
+      "coordination_score": 0.6536,
+      "emergency_frequency": 0.1342,
+      "science_yield": 0.5784,
+      "threat_survival_rate": 0.7521,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 960,
+      "mean_reward": 0.701,
+      "coordination_score": 0.6556,
+      "emergency_frequency": 0.1371,
+      "science_yield": 0.5432,
+      "threat_survival_rate": 0.7707,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 990,
+      "mean_reward": 0.7145,
+      "coordination_score": 0.658,
+      "emergency_frequency": 0.1533,
+      "science_yield": 0.5824,
+      "threat_survival_rate": 0.7671,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 1020,
+      "mean_reward": 0.7454,
+      "coordination_score": 0.641,
+      "emergency_frequency": 0.1542,
+      "science_yield": 0.5661,
+      "threat_survival_rate": 0.7699,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 1050,
+      "mean_reward": 0.7155,
+      "coordination_score": 0.6316,
+      "emergency_frequency": 0.1456,
+      "science_yield": 0.5808,
+      "threat_survival_rate": 0.8002,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 1080,
+      "mean_reward": 0.6945,
+      "coordination_score": 0.6484,
+      "emergency_frequency": 0.1549,
+      "science_yield": 0.5676,
+      "threat_survival_rate": 0.8131,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 1110,
+      "mean_reward": 0.7185,
+      "coordination_score": 0.6625,
+      "emergency_frequency": 0.1632,
+      "science_yield": 0.5733,
+      "threat_survival_rate": 0.8143,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 1140,
+      "mean_reward": 0.7102,
+      "coordination_score": 0.6329,
+      "emergency_frequency": 0.1677,
+      "science_yield": 0.5833,
+      "threat_survival_rate": 0.8275,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 1170,
+      "mean_reward": 0.6984,
+      "coordination_score": 0.6651,
+      "emergency_frequency": 0.173,
+      "science_yield": 0.6016,
+      "threat_survival_rate": 0.8379,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 1200,
+      "mean_reward": 0.7323,
+      "coordination_score": 0.6617,
+      "emergency_frequency": 0.1704,
+      "science_yield": 0.5943,
+      "threat_survival_rate": 0.8176,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 1230,
+      "mean_reward": 0.739,
+      "coordination_score": 0.6477,
+      "emergency_frequency": 0.1781,
+      "science_yield": 0.575,
+      "threat_survival_rate": 0.8486,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 1260,
+      "mean_reward": 0.6972,
+      "coordination_score": 0.6322,
+      "emergency_frequency": 0.1847,
+      "science_yield": 0.5773,
+      "threat_survival_rate": 0.86,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 1290,
+      "mean_reward": 0.75,
+      "coordination_score": 0.6576,
+      "emergency_frequency": 0.1804,
+      "science_yield": 0.5616,
+      "threat_survival_rate": 0.8347,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 1320,
+      "mean_reward": 0.7429,
+      "coordination_score": 0.667,
+      "emergency_frequency": 0.1876,
+      "science_yield": 0.5909,
+      "threat_survival_rate": 0.8548,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 1350,
+      "mean_reward": 0.7126,
+      "coordination_score": 0.6364,
+      "emergency_frequency": 0.1835,
+      "science_yield": 0.5834,
+      "threat_survival_rate": 0.8819,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 1380,
+      "mean_reward": 0.7508,
+      "coordination_score": 0.6489,
+      "emergency_frequency": 0.18,
+      "science_yield": 0.5962,
+      "threat_survival_rate": 0.8814,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 1410,
+      "mean_reward": 0.697,
+      "coordination_score": 0.6505,
+      "emergency_frequency": 0.1947,
+      "science_yield": 0.5519,
+      "threat_survival_rate": 0.8958,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 1440,
+      "mean_reward": 0.7532,
+      "coordination_score": 0.6618,
+      "emergency_frequency": 0.1856,
+      "science_yield": 0.5546,
+      "threat_survival_rate": 0.8804,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 1470,
+      "mean_reward": 0.6976,
+      "coordination_score": 0.6472,
+      "emergency_frequency": 0.1872,
+      "science_yield": 0.6091,
+      "threat_survival_rate": 0.9058,
+      "phase": "phase2_sarvadrishi"
+    },
+    {
+      "episode": 1500,
+      "mean_reward": 0.7004,
+      "coordination_score": 0.6693,
+      "emergency_frequency": 0.1942,
+      "science_yield": 0.5632,
+      "threat_survival_rate": 0.907,
+      "phase": "phase2_sarvadrishi"
+    }
+  ],
+  "phase3_emergency": [
+    {
+      "episode": 0,
+      "mean_reward": 0.7263,
+      "coordination_score": 0.6149,
+      "emergency_frequency": 0.0401,
+      "science_yield": 0.5521,
+      "threat_survival_rate": 0.531,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 10,
+      "mean_reward": 0.714,
+      "coordination_score": 0.6513,
+      "emergency_frequency": 0.0467,
+      "science_yield": 0.5429,
+      "threat_survival_rate": 0.5508,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 20,
+      "mean_reward": 0.7423,
+      "coordination_score": 0.6285,
+      "emergency_frequency": 0.0653,
+      "science_yield": 0.5636,
+      "threat_survival_rate": 0.5629,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 30,
+      "mean_reward": 0.7089,
+      "coordination_score": 0.6667,
+      "emergency_frequency": 0.0682,
+      "science_yield": 0.5852,
+      "threat_survival_rate": 0.5584,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 40,
+      "mean_reward": 0.757,
+      "coordination_score": 0.6387,
+      "emergency_frequency": 0.0636,
+      "science_yield": 0.5613,
+      "threat_survival_rate": 0.5939,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 50,
+      "mean_reward": 0.7597,
+      "coordination_score": 0.6718,
+      "emergency_frequency": 0.0613,
+      "science_yield": 0.5709,
+      "threat_survival_rate": 0.5952,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 60,
+      "mean_reward": 0.7256,
+      "coordination_score": 0.6611,
+      "emergency_frequency": 0.0589,
+      "science_yield": 0.5684,
+      "threat_survival_rate": 0.5728,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 70,
+      "mean_reward": 0.7176,
+      "coordination_score": 0.6515,
+      "emergency_frequency": 0.0694,
+      "science_yield": 0.5973,
+      "threat_survival_rate": 0.6086,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 80,
+      "mean_reward": 0.7258,
+      "coordination_score": 0.6694,
+      "emergency_frequency": 0.0767,
+      "science_yield": 0.5729,
+      "threat_survival_rate": 0.6038,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 90,
+      "mean_reward": 0.7435,
+      "coordination_score": 0.6941,
+      "emergency_frequency": 0.0682,
+      "science_yield": 0.5956,
+      "threat_survival_rate": 0.6097,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 100,
+      "mean_reward": 0.7688,
+      "coordination_score": 0.6724,
+      "emergency_frequency": 0.0741,
+      "science_yield": 0.5917,
+      "threat_survival_rate": 0.6188,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 110,
+      "mean_reward": 0.7855,
+      "coordination_score": 0.6945,
+      "emergency_frequency": 0.0785,
+      "science_yield": 0.6103,
+      "threat_survival_rate": 0.6345,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 120,
+      "mean_reward": 0.7795,
+      "coordination_score": 0.6834,
+      "emergency_frequency": 0.084,
+      "science_yield": 0.6254,
+      "threat_survival_rate": 0.6313,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 130,
+      "mean_reward": 0.7495,
+      "coordination_score": 0.6863,
+      "emergency_frequency": 0.0977,
+      "science_yield": 0.5903,
+      "threat_survival_rate": 0.6395,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 140,
+      "mean_reward": 0.7756,
+      "coordination_score": 0.69,
+      "emergency_frequency": 0.0861,
+      "science_yield": 0.584,
+      "threat_survival_rate": 0.656,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 150,
+      "mean_reward": 0.777,
+      "coordination_score": 0.6732,
+      "emergency_frequency": 0.091,
+      "science_yield": 0.632,
+      "threat_survival_rate": 0.6602,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 160,
+      "mean_reward": 0.7749,
+      "coordination_score": 0.6812,
+      "emergency_frequency": 0.1021,
+      "science_yield": 0.616,
+      "threat_survival_rate": 0.6691,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 170,
+      "mean_reward": 0.7899,
+      "coordination_score": 0.6862,
+      "emergency_frequency": 0.1062,
+      "science_yield": 0.6063,
+      "threat_survival_rate": 0.6884,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 180,
+      "mean_reward": 0.7536,
+      "coordination_score": 0.714,
+      "emergency_frequency": 0.0948,
+      "science_yield": 0.6064,
+      "threat_survival_rate": 0.677,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 190,
+      "mean_reward": 0.783,
+      "coordination_score": 0.6962,
+      "emergency_frequency": 0.099,
+      "science_yield": 0.6077,
+      "threat_survival_rate": 0.6743,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 200,
+      "mean_reward": 0.7951,
+      "coordination_score": 0.7182,
+      "emergency_frequency": 0.1119,
+      "science_yield": 0.596,
+      "threat_survival_rate": 0.7017,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 210,
+      "mean_reward": 0.7697,
+      "coordination_score": 0.6968,
+      "emergency_frequency": 0.1136,
+      "science_yield": 0.61,
+      "threat_survival_rate": 0.7138,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 220,
+      "mean_reward": 0.7626,
+      "coordination_score": 0.7011,
+      "emergency_frequency": 0.1118,
+      "science_yield": 0.6274,
+      "threat_survival_rate": 0.707,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 230,
+      "mean_reward": 0.7917,
+      "coordination_score": 0.707,
+      "emergency_frequency": 0.1172,
+      "science_yield": 0.6354,
+      "threat_survival_rate": 0.7071,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 240,
+      "mean_reward": 0.8021,
+      "coordination_score": 0.7183,
+      "emergency_frequency": 0.1178,
+      "science_yield": 0.6206,
+      "threat_survival_rate": 0.7232,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 250,
+      "mean_reward": 0.7659,
+      "coordination_score": 0.7157,
+      "emergency_frequency": 0.1226,
+      "science_yield": 0.6346,
+      "threat_survival_rate": 0.7106,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 260,
+      "mean_reward": 0.7976,
+      "coordination_score": 0.7029,
+      "emergency_frequency": 0.1275,
+      "science_yield": 0.6249,
+      "threat_survival_rate": 0.7311,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 270,
+      "mean_reward": 0.8001,
+      "coordination_score": 0.7024,
+      "emergency_frequency": 0.134,
+      "science_yield": 0.6044,
+      "threat_survival_rate": 0.731,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 280,
+      "mean_reward": 0.8041,
+      "coordination_score": 0.6925,
+      "emergency_frequency": 0.1364,
+      "science_yield": 0.603,
+      "threat_survival_rate": 0.7449,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 290,
+      "mean_reward": 0.8135,
+      "coordination_score": 0.6916,
+      "emergency_frequency": 0.1375,
+      "science_yield": 0.6061,
+      "threat_survival_rate": 0.7677,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 300,
+      "mean_reward": 0.8021,
+      "coordination_score": 0.7215,
+      "emergency_frequency": 0.1434,
+      "science_yield": 0.6031,
+      "threat_survival_rate": 0.7416,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 310,
+      "mean_reward": 0.7989,
+      "coordination_score": 0.7325,
+      "emergency_frequency": 0.1505,
+      "science_yield": 0.6453,
+      "threat_survival_rate": 0.7761,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 320,
+      "mean_reward": 0.7759,
+      "coordination_score": 0.7231,
+      "emergency_frequency": 0.1418,
+      "science_yield": 0.6101,
+      "threat_survival_rate": 0.7724,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 330,
+      "mean_reward": 0.7827,
+      "coordination_score": 0.7003,
+      "emergency_frequency": 0.1474,
+      "science_yield": 0.6581,
+      "threat_survival_rate": 0.7784,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 340,
+      "mean_reward": 0.7903,
+      "coordination_score": 0.7224,
+      "emergency_frequency": 0.1525,
+      "science_yield": 0.6125,
+      "threat_survival_rate": 0.8044,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 350,
+      "mean_reward": 0.7906,
+      "coordination_score": 0.7261,
+      "emergency_frequency": 0.1528,
+      "science_yield": 0.6535,
+      "threat_survival_rate": 0.7906,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 360,
+      "mean_reward": 0.7776,
+      "coordination_score": 0.7028,
+      "emergency_frequency": 0.1668,
+      "science_yield": 0.6407,
+      "threat_survival_rate": 0.784,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 370,
+      "mean_reward": 0.7881,
+      "coordination_score": 0.7047,
+      "emergency_frequency": 0.1527,
+      "science_yield": 0.6171,
+      "threat_survival_rate": 0.7913,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 380,
+      "mean_reward": 0.8035,
+      "coordination_score": 0.7026,
+      "emergency_frequency": 0.1662,
+      "science_yield": 0.6429,
+      "threat_survival_rate": 0.8242,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 390,
+      "mean_reward": 0.7963,
+      "coordination_score": 0.7074,
+      "emergency_frequency": 0.1745,
+      "science_yield": 0.6277,
+      "threat_survival_rate": 0.8213,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 400,
+      "mean_reward": 0.8038,
+      "coordination_score": 0.717,
+      "emergency_frequency": 0.1791,
+      "science_yield": 0.664,
+      "threat_survival_rate": 0.8472,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 410,
+      "mean_reward": 0.8223,
+      "coordination_score": 0.7199,
+      "emergency_frequency": 0.1728,
+      "science_yield": 0.6492,
+      "threat_survival_rate": 0.8256,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 420,
+      "mean_reward": 0.7825,
+      "coordination_score": 0.6986,
+      "emergency_frequency": 0.1693,
+      "science_yield": 0.6075,
+      "threat_survival_rate": 0.8502,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 430,
+      "mean_reward": 0.7752,
+      "coordination_score": 0.7286,
+      "emergency_frequency": 0.1826,
+      "science_yield": 0.6657,
+      "threat_survival_rate": 0.8469,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 440,
+      "mean_reward": 0.8223,
+      "coordination_score": 0.7155,
+      "emergency_frequency": 0.1788,
+      "science_yield": 0.6138,
+      "threat_survival_rate": 0.8733,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 450,
+      "mean_reward": 0.815,
+      "coordination_score": 0.7105,
+      "emergency_frequency": 0.1841,
+      "science_yield": 0.6273,
+      "threat_survival_rate": 0.8462,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 460,
+      "mean_reward": 0.7701,
+      "coordination_score": 0.7125,
+      "emergency_frequency": 0.1822,
+      "science_yield": 0.6395,
+      "threat_survival_rate": 0.8595,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 470,
+      "mean_reward": 0.7798,
+      "coordination_score": 0.7248,
+      "emergency_frequency": 0.1957,
+      "science_yield": 0.6269,
+      "threat_survival_rate": 0.8934,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 480,
+      "mean_reward": 0.7831,
+      "coordination_score": 0.7118,
+      "emergency_frequency": 0.1982,
+      "science_yield": 0.611,
+      "threat_survival_rate": 0.9034,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 490,
+      "mean_reward": 0.7724,
+      "coordination_score": 0.7167,
+      "emergency_frequency": 0.2015,
+      "science_yield": 0.6113,
+      "threat_survival_rate": 0.9054,
+      "phase": "phase3_emergency"
+    },
+    {
+      "episode": 500,
+      "mean_reward": 0.8269,
+      "coordination_score": 0.7168,
+      "emergency_frequency": 0.1924,
+      "science_yield": 0.6134,
+      "threat_survival_rate": 0.8839,
+      "phase": "phase3_emergency"
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "task_id": 4,
+  "seed": 1337,
+  "name": "Emergency Authority Mid-Coordination",
+  "difficulty": "very_hard",
+  "mission_window_minutes": 480,
+  "initial_power": 75.0,
+  "initial_fuel": 65.0,
+  "initial_thermal": 45.0,
+  "initial_compute": 100.0,
+  "initial_structural_integrity": 90.0,
+  "initial_data_buffer": 0.0,
+  "initial_comms_bandwidth": 100.0,
+  "initial_radiation_integrity": 100.0,
+  "objectives": [
+    {
+      "id": "spectrometer",
+      "name": "Atmospheric Spectrometry",
+      "priority": "MEDIUM",
+      "power_cost": 10,
+      "time_cost": 40,
+      "deadline_min": 120
+    },
+    {
+      "id": "geo_survey",
+      "name": "Geological Survey",
+      "priority": "MEDIUM",
+      "power_cost": 12,
+      "time_cost": 45,
+      "deadline_min": 120
+    }
+  ],
+  "comms_windows": [
+    {"open_at": 80, "close_at": 100}
+  ],
+  "eclipse_periods": [],
+  "events": [
+    {
+      "id": "debris_t30",
+      "event_type": "debris_field",
+      "detect_at": 30,
+      "impact_at": 45,
+      "intensity": 0.7,
+      "power_damage": 5.0,
+      "fuel_damage": 0.0,
+      "instrument_damage": 0.1,
+      "structural_damage": 28.0,
+      "comment": "Debris triggers structural cascade alert to Structural Sub-Agent at T+45"
+    },
+    {
+      "id": "solar_flare_t40",
+      "event_type": "solar_flare",
+      "detect_at": 40,
+      "impact_at": 55,
+      "intensity": 0.6,
+      "power_damage": 15.0,
+      "fuel_damage": 0.0,
+      "instrument_damage": 0.0,
+      "radiation_damage": 18.0,
+      "comment": "Solar flare stresses Power simultaneously with debris cascade"
+    }
+  ]
+}
