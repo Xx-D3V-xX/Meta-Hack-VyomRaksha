@@ -171,6 +171,42 @@ class R2ProbeObservation(ProbeObservation):
         description="Current mission phase label (nominal, threatened, degraded, critical, etc.)",
     )
 
+    # --- Convenience aliases for R1 field names ---
+    @property
+    def power(self) -> float:
+        """Alias for power_level (R1 field name)."""
+        return self.power_level
+
+    @property
+    def fuel(self) -> float:
+        """Alias for fuel_remaining (R1 field name)."""
+        return self.fuel_remaining
+
+    @property
+    def time(self) -> int:
+        """Alias for time_remaining (R1 field name)."""
+        return self.time_remaining
+
+    @property
+    def mission_failed(self) -> bool:
+        """Convenience accessor from metadata dict."""
+        return bool(self.metadata.get("mission_failed", False))
+
+    @property
+    def failure_reason(self) -> str:
+        """Convenience accessor from metadata dict."""
+        return str(self.metadata.get("failure_reason", ""))
+
+    @property
+    def stalling(self) -> bool:
+        """Convenience accessor from metadata dict."""
+        return bool(self.metadata.get("stalling", False))
+
+    @property
+    def consecutive_defers(self) -> int:
+        """Convenience accessor from metadata dict."""
+        return int(self.metadata.get("consecutive_defers", 0))
+
 
 # ---------------------------------------------------------------------------
 # R2EpisodeLogEntry

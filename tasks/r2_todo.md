@@ -324,7 +324,7 @@ Run pytest tests/ — must stay green.
 > Goal: SarvaDrishti, conflict resolver, strategy manager, emergency handler all implemented.
 > Exit criteria: Full deliberation cycle produces a valid approved action from sub-agent recommendations.
 
-- [ ] **R2-4.1** Create `server/orchestrator/conflict_resolver.py` and `strategy_manager.py`
+- [x] **R2-4.1** Create `server/orchestrator/conflict_resolver.py` and `strategy_manager.py`
 
 ```
 Claude Code prompt for R2-4.1:
@@ -355,7 +355,7 @@ urgency threshold behavior, strategy update triggers.
 Run pytest tests/test_orchestrator.py — must pass.
 ```
 
-- [ ] **R2-4.2** Create `server/orchestrator/emergency_handler.py` and `server/shadow_sim.py`
+- [x] **R2-4.2** Create `server/orchestrator/emergency_handler.py` and `server/shadow_sim.py`
 
 ```
 Claude Code prompt for R2-4.2:
@@ -376,7 +376,7 @@ Create server/shadow_sim.py — class ShadowSimulator:
 Write tests for both classes. Run pytest tests/ — must stay green.
 ```
 
-- [ ] **R2-4.3** Create `server/orchestrator/sarvadrishi.py` and `server/multi_agent_loop.py`
+- [x] **R2-4.3** Create `server/orchestrator/sarvadrishi.py` and `server/multi_agent_loop.py`
 
 ```
 Claude Code prompt for R2-4.3:
