@@ -513,9 +513,11 @@ def _run_grpo_training(
             report_to="none",
         )
 
+        import trl as _trl_mod
+        _grpo_kwargs = {"processing_class": tokenizer} if hasattr(_trl_mod, "__version__") and tuple(int(x) for x in _trl_mod.__version__.split(".")[:2]) >= (0, 12) else {"tokenizer": tokenizer}
         trainer = GRPOTrainer(
             model=model,
-            processing_class=tokenizer,
+            **_grpo_kwargs,
             reward_funcs=reward_fn,
             args=grpo_config,
             train_dataset=prompts_dataset,
@@ -529,7 +531,7 @@ def _run_grpo_training(
         _save_checkpoint(model, tokenizer, output_dir, push_to_hub, is_unsloth)
         return
 
-    _save_checkpoint(model, tokenizer, output_dir, push_to_hub)
+    _save_checkpoint(model, tokenizer, output_dir, push_to_hub, is_unsloth)
 
 
 def _minimal_smoke_loop(
