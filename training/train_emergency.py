@@ -364,7 +364,7 @@ def _run_agent_grpo(model, tokenizer, agent_name: str, steps: int, reward_fn, ou
             output_dir=os.path.join(output_dir, agent_name),
             max_steps=steps,
             per_device_train_batch_size=1,
-            num_generations=4,
+            num_generations=1,
             max_prompt_length=512,
             max_completion_length=256,
             learning_rate=1e-5,
@@ -373,6 +373,8 @@ def _run_agent_grpo(model, tokenizer, agent_name: str, steps: int, reward_fn, ou
             bf16=True,
             report_to="none",
         )
+        if not hasattr(model, "warnings_issued"):
+            model.warnings_issued = {}
         trainer = GRPOTrainer(
             model=model, processing_class=tokenizer,
             reward_funcs=reward_fn, args=config, train_dataset=dataset,
