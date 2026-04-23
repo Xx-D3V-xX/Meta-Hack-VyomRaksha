@@ -14,20 +14,22 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
 #SBATCH --time=12:00:00
-#SBATCH --output=logs/reward_model_%j.log
-#SBATCH --error=logs/reward_model_%j.err
+#SBATCH --output=logs/%x_%j.log
+#SBATCH --error=logs/%x_%j.err
+#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user=divit.gupta23@spit.ac.in
 
 set -euo pipefail
 
 # ── Environment ──────────────────────────────────────────────────────────────
-PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+PROJECT_DIR="${SLURM_SUBMIT_DIR}"
 CKPT_DIR="${PROJECT_DIR}/training/checkpoints"
 PAIRS_FILE="${PROJECT_DIR}/training/data/preference_pairs/sarvadrishi_pairs.jsonl"
 
 mkdir -p "${CKPT_DIR}" "${PROJECT_DIR}/logs"
 
-module load python/3.11.14
-source "${PROJECT_DIR}/my_env/bin/activate"
+module load python/3.11.14 || { echo "FATAL: module load failed"; exit 1; }
+source ~/vyom_env/bin/activate
 
 export HF_HOME="${PROJECT_DIR}/.hf_cache"
 export TRANSFORMERS_CACHE="${HF_HOME}"
@@ -41,12 +43,12 @@ else
     echo "HF_TOKEN not set — reward model saved locally only"
 fi
 
-cd "${PROJECT_DIR}"
+cd ~/Meta-Hack-VyomRaksha
 
 echo "=== VyomRaksha Reward Model Training — Job ${SLURM_JOB_ID} ==="
 echo "Node: $(hostname)  Started: $(date)"
 echo "Output: ${CKPT_DIR}/sarvadrishi_reward_model/"
-nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv,noheader
+nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv,noheader || echo "nvidia-smi unavailable"
 
 # ── Verify preference pairs ──────────────────────────────────────────────────
 if [ -f "${PAIRS_FILE}" ]; then
@@ -79,3 +81,4 @@ echo "Checkpoint: ${CKPT_DIR}/sarvadrishi_reward_model/"
 echo ""
 echo "Next step:"
 echo "  sbatch training/cluster_jobs/phase2_sarvadrishi.sh  (R2-8.2)"
+echo "Job $SLURM_JOB_ID complete on $(date)"

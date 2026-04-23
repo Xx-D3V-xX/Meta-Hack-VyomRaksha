@@ -14,21 +14,23 @@
 #SBATCH --job-name=vy_phase1_5
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=8
-#SBATCH --mem=64G
+#SBATCH --mem=80G
 #SBATCH --time=3-00:00:00
-#SBATCH --output=logs/phase1_5_%j.log
-#SBATCH --error=logs/phase1_5_%j.err
+#SBATCH --output=logs/%x_%j.log
+#SBATCH --error=logs/%x_%j.err
+#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user=divit.gupta23@spit.ac.in
 
 set -euo pipefail
 
 # ── Environment ──────────────────────────────────────────────────────────────
-PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+PROJECT_DIR="${SLURM_SUBMIT_DIR}"
 CKPT_DIR="${PROJECT_DIR}/training/checkpoints"
 
 mkdir -p "${CKPT_DIR}" "${PROJECT_DIR}/logs"
 
-module load python/3.11.14
-source "${PROJECT_DIR}/my_env/bin/activate"
+module load python/3.11.14 || { echo "FATAL: module load failed"; exit 1; }
+source ~/vyom_env/bin/activate
 
 export HF_HOME="${PROJECT_DIR}/.hf_cache"
 export TRANSFORMERS_CACHE="${HF_HOME}"
@@ -39,12 +41,12 @@ if [ -n "${HF_TOKEN:-}" ]; then
     PUSH_FLAG="--push_to_hub"
 fi
 
-cd "${PROJECT_DIR}"
+cd ~/Meta-Hack-VyomRaksha
 
 echo "=== VyomRaksha Phase 1.5 — Joint Exposure — Job ${SLURM_JOB_ID} ==="
 echo "Node: $(hostname)  Started: $(date)"
 echo "Checkpoints: ${CKPT_DIR}"
-nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv,noheader
+nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv,noheader || echo "nvidia-smi unavailable"
 
 # ── Verify Phase 1 checkpoints exist before starting ────────────────────────
 ALL_AGENTS=("threat" "power" "fuel" "thermal" "computational" "structural" "communications" "probe_systems")
@@ -97,3 +99,4 @@ echo ""
 echo "=== Phase 1.5 COMPLETE: $(date) ==="
 echo "All 8 sub-agents have completed Phase 1 + Phase 1.5 exposure."
 echo "Ready for: reward_model.sh → phase2_sarvadrishi.sh"
+echo "Job $SLURM_JOB_ID complete on $(date)"

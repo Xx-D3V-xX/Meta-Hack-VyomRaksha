@@ -10,19 +10,21 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=64G
 #SBATCH --time=7-00:00:00
-#SBATCH --output=logs/phase1_card1_%j.log
-#SBATCH --error=logs/phase1_card1_%j.err
+#SBATCH --output=logs/%x_%j.log
+#SBATCH --error=logs/%x_%j.err
+#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user=divit.gupta23@spit.ac.in
 
 set -euo pipefail
 
 # ── Environment ──────────────────────────────────────────────────────────────
-PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+PROJECT_DIR="${SLURM_SUBMIT_DIR}"
 CKPT_DIR="${PROJECT_DIR}/training/checkpoints"
 
 mkdir -p "${CKPT_DIR}" "${PROJECT_DIR}/logs"
 
-module load python/3.11.14
-source "${PROJECT_DIR}/my_env/bin/activate"
+module load python/3.11.14 || { echo "FATAL: module load failed"; exit 1; }
+source ~/vyom_env/bin/activate
 
 export HF_HOME="${PROJECT_DIR}/.hf_cache"
 export TRANSFORMERS_CACHE="${HF_HOME}"
@@ -37,13 +39,13 @@ else
     echo "HF_TOKEN not set — checkpoints saved locally only"
 fi
 
-cd "${PROJECT_DIR}"
+cd ~/Meta-Hack-VyomRaksha
 
 echo "=== VyomRaksha Phase 1 — Card 1 — Job ${SLURM_JOB_ID} ==="
 echo "Node: $(hostname)  Started: $(date)"
 echo "Project: ${PROJECT_DIR}"
 echo "Checkpoints: ${CKPT_DIR}"
-nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv,noheader
+nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv,noheader || echo "nvidia-smi unavailable"
 
 # ── Step 1: Threat Sub-Agent (Qwen2.5-14B, 300 steps) ───────────────────────
 # Threat is the most compute-intensive agent: 14B model, deepest CoT reasoning.
@@ -88,3 +90,4 @@ echo ""
 echo "=== Card 1 Phase 1 COMPLETE: $(date) ==="
 echo "Agents trained: threat, power, fuel"
 echo "Checkpoints at: ${CKPT_DIR}/{threat,power,fuel}/"
+echo "Job $SLURM_JOB_ID complete on $(date)"

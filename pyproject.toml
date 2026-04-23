@@ -47,6 +47,11 @@ include-package-data = true
 packages = ["vyomraksha", "vyomraksha.server"]
 package-dir = { "vyomraksha" = ".", "vyomraksha.server" = "server" }
 
+[tool.pyright]
+extraPaths = ["."]
+venvPath = "."
+venv = ".venv"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]

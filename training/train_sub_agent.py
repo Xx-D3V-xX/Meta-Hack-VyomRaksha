@@ -464,18 +464,15 @@ def _make_grpo_reward_fn(agent_name: str):
 
     GRPOTrainer calls: reward_fn(prompts, completions) → list[float]
     """
-    env = IsolatedResourceEnv(agent_name, seed=99)
-
     def _reward_fn(prompts: list[str], completions: list[str], **_kwargs) -> list[float]:
         rewards = []
         for completion in completions:
-            action = _parse_action_from_completion(completion)
-            # Run one step in the env with this action to get local reward
-            obs, reward, done, catastrophic = env.step(action)
+            fresh_env = IsolatedResourceEnv(agent_name, seed=random.randint(0, 9999))
+            obs, reward, done, catastrophic = fresh_env.step(
+                _parse_action_from_completion(completion)
+            )
             if catastrophic:
-                reward = 0.0  # hard penalty
-            if done:
-                env.reset()
+                reward = 0.0
             rewards.append(float(reward))
         return rewards
 
@@ -668,15 +665,21 @@ def _run_grpo_loop(
             report_to="none",
         )
 
+        import trl as _trl_mod
+        _grpo_kwargs = {"processing_class": tokenizer} if hasattr(_trl_mod, "__version__") and tuple(int(x) for x in _trl_mod.__version__.split(".")[:2]) >= (0, 12) else {"tokenizer": tokenizer}
         trainer = GRPOTrainer(
             model=model,
-            processing_class=tokenizer,
+            **_grpo_kwargs,
             reward_funcs=reward_fn,
             args=grpo_config,
             train_dataset=prompts_dataset,
         )
         trainer.train()
         log.info("GRPO training complete")
+        try:
+            _save_checkpoint(model, tokenizer, agent_name, output_dir, push_to_hub, is_unsloth)
+        except Exception as exc:
+            log.warning("Checkpoint save failed: %s — training complete but no checkpoint", exc)
 
     except ImportError:
         log.warning(
@@ -685,9 +688,6 @@ def _run_grpo_loop(
         )
         _run_minimal_grpo_loop(agent_name, steps, batch_size, reward_fn, env)
         return
-
-    # Save LoRA adapter
-    _save_checkpoint(model, tokenizer, agent_name, output_dir, push_to_hub, is_unsloth)
 
 
 def _build_grpo_prompt_dataset(agent_name: str, n: int = 200):
