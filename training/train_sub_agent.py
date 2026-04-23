@@ -586,6 +586,13 @@ def _run_sft_warmup(
             for s in samples
         ])
 
+        # TRL <0.12 uses max_seq_length; TRL >=0.12 removed it (use dataset_text_field instead)
+        import trl as _trl_sft
+        _trl_ver = tuple(int(x) for x in _trl_sft.__version__.split(".")[:2])
+        _sft_len_kwargs = (
+            {"max_seq_length": _GRPO_MAX_PROMPT_LENGTH + _GRPO_MAX_COMPLETION_LENGTH}
+            if _trl_ver < (0, 12) else {}
+        )
         sft_config = SFTConfig(
             output_dir=os.path.join(_DEFAULT_OUTPUT_DIR, f"{agent_name}_sft_tmp"),
             num_train_epochs=epochs,
@@ -597,7 +604,7 @@ def _run_sft_warmup(
             save_strategy="no",
             bf16=True,
             report_to="none",
-            max_seq_length=_GRPO_MAX_PROMPT_LENGTH + _GRPO_MAX_COMPLETION_LENGTH,
+            **_sft_len_kwargs,
         )
 
         trainer = SFTTrainer(
@@ -666,7 +673,11 @@ def _run_grpo_loop(
         )
 
         import trl as _trl_mod
-        _grpo_kwargs = {"processing_class": tokenizer} if hasattr(_trl_mod, "__version__") and tuple(int(x) for x in _trl_mod.__version__.split(".")[:2]) >= (0, 12) else {"tokenizer": tokenizer}
+        _grpo_kwargs = (
+            {"processing_class": tokenizer}
+            if tuple(int(x) for x in _trl_mod.__version__.split(".")[:2]) >= (0, 12)
+            else {"tokenizer": tokenizer}
+        )
         trainer = GRPOTrainer(
             model=model,
             **_grpo_kwargs,
