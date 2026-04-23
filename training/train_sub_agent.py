@@ -609,7 +609,7 @@ def _run_sft_warmup(
 
         trainer = SFTTrainer(
             model=model,
-            tokenizer=tokenizer,
+            processing_class=tokenizer,
             train_dataset=hf_data,
             args=sft_config,
         )
@@ -655,7 +655,8 @@ def _run_grpo_loop(
 
         # Build a small dataset of prompts (GRPO generates completions itself)
         prompts_dataset = _build_grpo_prompt_dataset(agent_name, n=max(steps * batch_size, 50))
-
+        # num_generations must be divisible by per_device_train_batch_size (TRL 0.24+)
+        _num_generations = batch_size if (_GRPO_NUM_GENERATIONS % batch_size != 0) else _GRPO_NUM_GENERATIONS
         grpo_config = GRPOConfig(
             output_dir=output_dir,
             num_train_epochs=1,
@@ -663,7 +664,7 @@ def _run_grpo_loop(
             per_device_train_batch_size=batch_size,
             gradient_accumulation_steps=max(1, 4 // batch_size),
             learning_rate=1e-5,
-            num_generations=_GRPO_NUM_GENERATIONS,
+            num_generations=_num_generations,
             max_prompt_length=_GRPO_MAX_PROMPT_LENGTH,
             max_completion_length=_GRPO_MAX_COMPLETION_LENGTH,
             logging_steps=1,
