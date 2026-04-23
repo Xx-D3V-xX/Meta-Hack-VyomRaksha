@@ -21,12 +21,22 @@
 
 set -euo pipefail
 
-module load python/3.11.14 || { echo "FATAL: module load failed"; exit 1; }
-source ~/vyom_env/bin/activate
-cd ~/Meta-Hack-VyomRaksha
-
 # ── Environment ──────────────────────────────────────────────────────────────
-PROJECT_DIR="$(pwd)"
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+
+# Activate venv: try project venv first, then home venv, then conda
+if [ -f "${PROJECT_DIR}/.venv/bin/activate" ]; then
+    source "${PROJECT_DIR}/.venv/bin/activate"
+elif [ -f "${HOME}/vyom_env/bin/activate" ]; then
+    source "${HOME}/vyom_env/bin/activate"
+elif command -v conda &>/dev/null; then
+    source /opt/conda/etc/profile.d/conda.sh 2>/dev/null || true
+    conda activate pytorch 2>/dev/null || true
+else
+    echo "WARNING: No venv found — using system Python"
+fi
+
+cd "${PROJECT_DIR}"
 CKPT_DIR="${PROJECT_DIR}/training/checkpoints"
 
 mkdir -p "${CKPT_DIR}" "${PROJECT_DIR}/logs"
@@ -35,7 +45,7 @@ export HF_HOME="${PROJECT_DIR}/.hf_cache"
 export TRANSFORMERS_CACHE="${HF_HOME}"
 export WANDB_DISABLED=true
 
-echo "=== VyomRaksha Phase 3 — Emergency Authority — Job ${SLURM_JOB_ID} ==="
+echo "=== VyomRaksha Phase 3 — Emergency Authority — Job ${SLURM_JOB_ID:-local_$$} ==="
 echo "Node: $(hostname)  Started: $(date)"
 echo "Project: ${PROJECT_DIR}"
 echo "Checkpoints: ${CKPT_DIR}"
@@ -59,4 +69,4 @@ echo ""
 echo "=== Phase 3 Emergency Calibration COMPLETE: $(date) ==="
 echo "Emergency-authority sub-agents updated in: ${CKPT_DIR}/"
 echo "Pipeline complete — all phases done."
-echo "Job $SLURM_JOB_ID complete on $(date)"
+echo "Job ${SLURM_JOB_ID:-local_$$} complete on $(date)"

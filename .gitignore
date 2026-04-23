@@ -10,3 +10,18 @@ dist/
 # progress.md
 # progress_r2.md
 # CLAUDE.md
+
+# Model weights — push to HF Hub, not GitHub (100MB file limit)
+training/checkpoints/**/*.safetensors
+training/checkpoints/**/*.bin
+training/checkpoints/**/*.gguf
+training/checkpoints/**/*.pt
+training/checkpoints/**/*.pth
+.hf_cache/
+
+# AWS training logs (can be very large)
+logs/aws/*.log
+
+# Keep PID files and small metadata
+!logs/aws/*.pid
+!logs/aws/*.json
