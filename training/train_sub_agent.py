@@ -679,6 +679,8 @@ def _run_grpo_loop(
             if tuple(int(x) for x in _trl_mod.__version__.split(".")[:2]) >= (0, 12)
             else {"tokenizer": tokenizer}
         )
+        if not hasattr(model, "warnings_issued"):
+            model.warnings_issued = {}
         trainer = GRPOTrainer(
             model=model,
             **_grpo_kwargs,

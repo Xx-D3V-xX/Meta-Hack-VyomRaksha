@@ -254,7 +254,7 @@ def _run_reward_training(
 
         trainer = RewardTrainer(
             model=model,
-            tokenizer=tokenizer,
+            processing_class=tokenizer,
             args=config,
             train_dataset=hf_data,
         )

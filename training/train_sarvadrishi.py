@@ -504,7 +504,7 @@ def _run_grpo_training(
             per_device_train_batch_size=batch_size,
             gradient_accumulation_steps=max(1, 4 // batch_size),
             learning_rate=5e-6,
-            num_generations=_GRPO_NUM_GENERATIONS,
+            num_generations=_GRPO_NUM_GENERATIONS if (_GRPO_NUM_GENERATIONS % batch_size == 0) else batch_size,
             max_prompt_length=_GRPO_MAX_PROMPT_LENGTH,
             max_completion_length=_GRPO_MAX_COMPLETION_LENGTH,
             logging_steps=1,
@@ -515,6 +515,8 @@ def _run_grpo_training(
 
         import trl as _trl_mod
         _grpo_kwargs = {"processing_class": tokenizer} if hasattr(_trl_mod, "__version__") and tuple(int(x) for x in _trl_mod.__version__.split(".")[:2]) >= (0, 12) else {"tokenizer": tokenizer}
+        if not hasattr(model, "warnings_issued"):
+            model.warnings_issued = {}
         trainer = GRPOTrainer(
             model=model,
             **_grpo_kwargs,
