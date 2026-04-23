@@ -24,13 +24,22 @@
 set -euo pipefail
 
 # ── Environment ──────────────────────────────────────────────────────────────
-PROJECT_DIR="${SLURM_SUBMIT_DIR}"
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 CKPT_DIR="${PROJECT_DIR}/training/checkpoints"
 
 mkdir -p "${CKPT_DIR}" "${PROJECT_DIR}/logs"
 
-module load python/3.11.14 || { echo "FATAL: module load failed"; exit 1; }
-source ~/vyom_env/bin/activate
+# Activate venv: try project venv first, then home venv, then conda
+if [ -f "${PROJECT_DIR}/.venv/bin/activate" ]; then
+    source "${PROJECT_DIR}/.venv/bin/activate"
+elif [ -f "${HOME}/vyom_env/bin/activate" ]; then
+    source "${HOME}/vyom_env/bin/activate"
+elif command -v conda &>/dev/null; then
+    source /opt/conda/etc/profile.d/conda.sh 2>/dev/null || true
+    conda activate pytorch 2>/dev/null || true
+else
+    echo "WARNING: No venv found — using system Python"
+fi
 
 export HF_HOME="${PROJECT_DIR}/.hf_cache"
 export TRANSFORMERS_CACHE="${HF_HOME}"
@@ -41,9 +50,9 @@ if [ -n "${HF_TOKEN:-}" ]; then
     PUSH_FLAG="--push_to_hub"
 fi
 
-cd ~/Meta-Hack-VyomRaksha
+cd "${PROJECT_DIR}"
 
-echo "=== VyomRaksha Phase 1.5 — Joint Exposure — Job ${SLURM_JOB_ID} ==="
+echo "=== VyomRaksha Phase 1.5 — Joint Exposure — Job ${SLURM_JOB_ID:-local_$$} ==="
 echo "Node: $(hostname)  Started: $(date)"
 echo "Checkpoints: ${CKPT_DIR}"
 nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv,noheader || echo "nvidia-smi unavailable"
@@ -99,4 +108,4 @@ echo ""
 echo "=== Phase 1.5 COMPLETE: $(date) ==="
 echo "All 8 sub-agents have completed Phase 1 + Phase 1.5 exposure."
 echo "Ready for: reward_model.sh → phase2_sarvadrishi.sh"
-echo "Job $SLURM_JOB_ID complete on $(date)"
+echo "Job ${SLURM_JOB_ID:-local_$$} complete on $(date)"

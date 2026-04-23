@@ -373,11 +373,20 @@ def _run_agent_grpo(model, tokenizer, agent_name: str, steps: int, reward_fn, ou
             bf16=True,
             report_to="none",
         )
+        import trl as _trl_mod
+        _grpo_kwargs = (
+            {"processing_class": tokenizer}
+            if tuple(int(x) for x in _trl_mod.__version__.split(".")[:2]) >= (0, 12)
+            else {"tokenizer": tokenizer}
+        )
         if not hasattr(model, "warnings_issued"):
             model.warnings_issued = {}
         trainer = GRPOTrainer(
-            model=model, processing_class=tokenizer,
-            reward_funcs=reward_fn, args=config, train_dataset=dataset,
+            model=model,
+            **_grpo_kwargs,
+            reward_funcs=reward_fn,
+            args=config,
+            train_dataset=dataset,
         )
         trainer.train()
 

@@ -8,9 +8,9 @@
 
 ## Current Status
 
-**Overall phase:** R2 IMPLEMENTATION IN PROGRESS — R2-8.1 complete. Cluster job scripts written. Training pipeline ready to submit to SPIT cluster.
-**Last updated:** 2026-04-22
-**Next session must start at:** R2-8.2 — Submit Phase 2 SarvaDrishti training + create `phase2_sarvadrishi.sh`. See r2_todo.md R2-8.2.
+**Overall phase:** R2 AWS PRE-FLIGHT COMPLETE — All bugs fixed. training/aws/ scripts created. 1019/1019 tests passing. Ready to launch 3 EC2 instances.
+**Last updated:** 2026-04-23
+**Next session must start at:** Launch 3 AWS EC2 instances per `training/aws/README.md`. Instance 1 (card1) + Instance 2 (card2) in parallel, then phase1_5, then reward on Instance 3, then sarvadrishi.
 
 ---
 
@@ -765,6 +765,63 @@ sbatch --dependency=afterok:${JOB1}:${JOB2} training/cluster_jobs/phase1_5.sh
 - `phase2_sarvadrishi.sh` (R2-8.2) not yet created — needed after reward_model completes
 
 **Next session must start at:** R2-8.2 — Create `training/cluster_jobs/phase2_sarvadrishi.sh` and `phase3_emergency.sh`, then submit Phase 2 when Phase 1.5 + reward model are done.
+
+---
+
+### Session AWS Pre-Flight Audit — 2026-04-23
+
+**What was done:**
+Fixed all 5 pre-AWS bugs and created the 3 new AWS training files.
+
+**Bugs fixed:**
+
+- **Bug 1 — `phase2_sarvadrishi.sh` PUSH_FLAG:** Changed `--push_to_hub True` → `--push_to_hub`. `train_sarvadrishi.py` defines the flag as `action="store_true"`; passing a string value `"True"` was breaking argparse.
+
+- **Bug 2 — `train_emergency.py` GRPOTrainer:** Added TRL version check to `_run_agent_grpo()`. On TRL < 0.12 the constructor argument is `tokenizer=`, not `processing_class=`. Now detects version at runtime and passes the correct kwarg. (Same pattern already used correctly in `train_sub_agent.py` and `train_sarvadrishi.py`.)
+
+- **Bug 3 — `train_reward_model.py` Unsloth branch:** Removed the entire Unsloth try/except block from `_load_model_and_tokenizer()`. The reward model requires `AutoModelForSequenceClassification` (num_labels=1); Unsloth's `FastLanguageModel` is causal-only and produces a wrong model type silently. Added a comment block above the function explaining why Unsloth must never be used here.
+
+- **Bug 4 — All six `cluster_jobs/*.sh` scripts (EC2 compatibility):**
+  - Removed all `module load python/3.11.14` lines (EC2 DLAMI has no environment modules)
+  - Replaced `PROJECT_DIR="${SLURM_SUBMIT_DIR}"` with `PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"` in all scripts (phase1_card1, phase1_card2, phase1_5, reward_model, phase2_sarvadrishi, phase3_emergency)
+  - Replaced `source ~/vyom_env/bin/activate` with 3-tier fallback: project `.venv` → `~/vyom_env` → conda pytorch env → system Python warning
+  - Replaced `cd ~/Meta-Hack-VyomRaksha` with `cd "${PROJECT_DIR}"`
+  - Replaced all `${SLURM_JOB_ID}` with `${SLURM_JOB_ID:-local_$$}` for meaningful log IDs on EC2
+  - `phase2_sarvadrishi.sh` only: changed `--gres=gpu:2` → `gpu:1`, `--cpus-per-task=112` → `8` (g5.2xlarge has 1 GPU; SLURM job would hang indefinitely waiting for a second GPU that never comes)
+
+- **Bug 5 — `.gitignore`:** Appended model weight exclusion patterns (`*.safetensors`, `*.bin`, `*.gguf`, `*.pt`, `*.pth` under `training/checkpoints/`), `.hf_cache/` exclusion, `logs/aws/*.log` exclusion, and negation rules to keep PID/JSON metadata files.
+
+**New files created:**
+- `training/aws/setup_instance.sh` — One-time EC2 setup: GPU check, conda activation, dependency install (trl==0.16.0, transformers, unsloth, peft, bitsandbytes, datasets, huggingface_hub), repo clone/pull, HF login, model pre-download by role (card1/card2/reward/sarvadrishi/emergency/all), GitHub credentials, smoke tests, environment summary
+- `training/aws/run_training.sh` — Training launcher: role-based routing to cluster_jobs scripts via nohup; Phase 1.5 inline launch; prerequisite checks for sarvadrishi and emergency roles; optional GitHub push watcher
+- `training/aws/README.md` — Step-by-step 3-instance launch guide with cost estimates (~$51 total), instance types, AMI, disk sizing, monitoring commands, crash recovery, checkpoint locations, HF Space env vars
+
+**Files modified:**
+- `training/train_emergency.py` — Bug 2 fix
+- `training/train_reward_model.py` — Bug 3 fix
+- `training/cluster_jobs/phase1_card1.sh` — Bug 4 (all sub-fixes)
+- `training/cluster_jobs/phase1_card2.sh` — Bug 4 (all sub-fixes)
+- `training/cluster_jobs/phase1_5.sh` — Bug 4 (all sub-fixes)
+- `training/cluster_jobs/reward_model.sh` — Bug 4 (all sub-fixes)
+- `training/cluster_jobs/phase2_sarvadrishi.sh` — Bug 1 + Bug 4 (all sub-fixes including gpu:2→1 and cpus:112→8)
+- `training/cluster_jobs/phase3_emergency.sh` — Bug 4 (all sub-fixes)
+- `.gitignore` — Bug 5 fix
+
+**Local verification results (all 7 commands exit 0):**
+
+| Command | Exit | Result |
+|---|---|---|
+| `train_sub_agent.py --agent power --steps 3 --skip_model_load` | 0 | avg_reward=0.2872, eval PASSED |
+| `train_sub_agent.py --agent threat --steps 3 --skip_model_load` | 0 | avg_reward=0.2009, no crash |
+| `train_reward_model.py --steps 3 --batch_size 1 --model_size tiny` | 0 | 3 pairs smoke-test passed |
+| `train_sarvadrishi.py --steps 3 --batch_size 1 --model_size tiny` | 0 | avg_reward=0.9161, no crash |
+| `train_emergency.py --steps 3` | 0 | All 6 agents smoke-tested |
+| `eval_pipeline.py --n_eval_episodes 1` | 0 | Dashboard JSON written |
+| `pytest tests/ -q --tb=short` | 0 | **1019/1019 passed in 28.22s** |
+
+**Status:** AWS training pipeline verified and ready to launch.
+
+**Next session:** Launch 3 AWS EC2 instances per `training/aws/README.md`.
 
 <!-- Copy the session block above for each new session -->
 

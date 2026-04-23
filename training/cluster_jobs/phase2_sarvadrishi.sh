@@ -10,8 +10,8 @@
 # Or use submit_phase2.sh which handles this automatically.
 #
 #SBATCH --job-name=vy_phase2_sarva
-#SBATCH --gres=gpu:2
-#SBATCH --cpus-per-task=112
+#SBATCH --gres=gpu:1
+#SBATCH --cpus-per-task=8
 #SBATCH --mem=120G
 #SBATCH --time=7-00:00:00
 #SBATCH --output=logs/%x_%j.log
@@ -21,12 +21,22 @@
 
 set -euo pipefail
 
-module load python/3.11.14 || { echo "FATAL: module load failed"; exit 1; }
-source ~/vyom_env/bin/activate
-cd ~/Meta-Hack-VyomRaksha
-
 # ── Environment ──────────────────────────────────────────────────────────────
-PROJECT_DIR="$(pwd)"
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+
+# Activate venv: try project venv first, then home venv, then conda
+if [ -f "${PROJECT_DIR}/.venv/bin/activate" ]; then
+    source "${PROJECT_DIR}/.venv/bin/activate"
+elif [ -f "${HOME}/vyom_env/bin/activate" ]; then
+    source "${HOME}/vyom_env/bin/activate"
+elif command -v conda &>/dev/null; then
+    source /opt/conda/etc/profile.d/conda.sh 2>/dev/null || true
+    conda activate pytorch 2>/dev/null || true
+else
+    echo "WARNING: No venv found — using system Python"
+fi
+
+cd "${PROJECT_DIR}"
 CKPT_DIR="${PROJECT_DIR}/training/checkpoints"
 
 mkdir -p "${CKPT_DIR}" "${PROJECT_DIR}/logs"
@@ -37,13 +47,13 @@ export WANDB_DISABLED=true
 
 PUSH_FLAG=""
 if [ -n "${HF_TOKEN:-}" ]; then
-    PUSH_FLAG="--push_to_hub True"
+    PUSH_FLAG="--push_to_hub"
     echo "HF_TOKEN found — checkpoint will be pushed to Hub"
 else
     echo "HF_TOKEN not set — checkpoint saved locally only"
 fi
 
-echo "=== VyomRaksha Phase 2 — SarvaDrishti — Job ${SLURM_JOB_ID} ==="
+echo "=== VyomRaksha Phase 2 — SarvaDrishti — Job ${SLURM_JOB_ID:-local_$$} ==="
 echo "Node: $(hostname)  Started: $(date)"
 echo "Project: ${PROJECT_DIR}"
 echo "Checkpoints: ${CKPT_DIR}"
@@ -83,4 +93,4 @@ echo ""
 echo "=== Phase 2 SarvaDrishti COMPLETE: $(date) ==="
 echo "Checkpoint: ${CKPT_DIR}/sarvadrishi/"
 echo "Next step: submit_phase2.sh handles phase3_emergency.sh automatically"
-echo "Job $SLURM_JOB_ID complete on $(date)"
+echo "Job ${SLURM_JOB_ID:-local_$$} complete on $(date)"

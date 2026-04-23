@@ -162,32 +162,12 @@ def _generate_synthetic_pairs(n: int = 30) -> list[dict[str, str]]:
 # Model loading (mirrors train_sub_agent.py pattern)
 # ---------------------------------------------------------------------------
 
+# Reward model requires a classification head (num_labels=1).
+# Unsloth FastLanguageModel is causal-only and cannot produce a classifier.
+# We use HF AutoModelForSequenceClassification directly, even when Unsloth
+# is installed. Do NOT add an Unsloth branch here.
 def _load_model_and_tokenizer(model_id: str):
     """Load Qwen with QLoRA 4-bit. Returns (model, tokenizer)."""
-    try:
-        from unsloth import FastLanguageModel  # type: ignore[import]
-
-        log.info("Loading %s via Unsloth (QLoRA 4-bit)", model_id)
-        model, tokenizer = FastLanguageModel.from_pretrained(
-            model_name=model_id,
-            max_seq_length=1024,
-            load_in_4bit=True,
-            dtype=None,
-        )
-        model = FastLanguageModel.get_peft_model(
-            model,
-            r=_LORA_R,
-            target_modules=_LORA_TARGET_MODULES,
-            lora_alpha=_LORA_ALPHA,
-            lora_dropout=0.05,
-            bias="none",
-            use_gradient_checkpointing="unsloth",
-        )
-        return model, tokenizer
-
-    except ImportError:
-        pass
-
     try:
         import torch  # type: ignore[import]
         from transformers import AutoModelForSequenceClassification, AutoTokenizer, BitsAndBytesConfig  # type: ignore[import]
