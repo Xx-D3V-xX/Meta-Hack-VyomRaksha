@@ -505,7 +505,7 @@ def _run_grpo_training(
             gradient_accumulation_steps=max(1, 4 // batch_size),
             learning_rate=5e-6,
             num_generations=_GRPO_NUM_GENERATIONS if (_GRPO_NUM_GENERATIONS % batch_size == 0) else batch_size,
-            max_prompt_length=_GRPO_MAX_PROMPT_LENGTH,
+            
             max_completion_length=_GRPO_MAX_COMPLETION_LENGTH,
             logging_steps=1,
             save_steps=max(1, steps // 5),
