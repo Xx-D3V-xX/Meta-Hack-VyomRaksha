@@ -66,7 +66,7 @@ python training/train_sub_agent.py \
     --agent     threat \
     --model_size 14b \
     --steps     300 \
-    --batch_size 2 \
+    --batch_size 4 \
     --output_dir "${CKPT_DIR}" \
     ${PUSH_FLAG}
 echo "$(date) threat DONE — checkpoint: ${CKPT_DIR}/threat/"

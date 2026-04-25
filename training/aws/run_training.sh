@@ -144,7 +144,7 @@ launch_phase1_5() {
             echo "$(date) --- Phase 1.5: ${AGENT} ---"
             SIZE="7b"
             BATCH=4
-            if [ "${AGENT}" = "threat" ]; then SIZE="14b"; BATCH=2; fi
+            if [ "${AGENT}" = "threat" ]; then SIZE="14b"; BATCH=4; fi
             python training/train_sub_agent.py \
                 --agent "${AGENT}" \
                 --model_size "${SIZE}" \

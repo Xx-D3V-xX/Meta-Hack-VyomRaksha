@@ -665,7 +665,7 @@ def _run_grpo_loop(
             gradient_accumulation_steps=max(1, 4 // batch_size),
             learning_rate=1e-5,
             num_generations=_num_generations,
-            max_prompt_length=_GRPO_MAX_PROMPT_LENGTH,
+            
             max_completion_length=_GRPO_MAX_COMPLETION_LENGTH,
             logging_steps=1,
             save_steps=max(1, steps // 5),

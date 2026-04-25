@@ -35,7 +35,7 @@ echo "=========================================="
 # ── 1. GPU check ─────────────────────────────────────────────────────────────
 echo ""
 echo "[1/9] GPU info"
-nvidia-smi --query-gpu=name,memory.total,driver_version,cuda_version \
+nvidia-smi --query-gpu=name,memory.total,driver_version \
     --format=csv,noheader || { echo "ERROR: nvidia-smi failed. Is this a GPU instance?"; exit 1; }
 
 # ── 2. Activate conda environment ────────────────────────────────────────────
@@ -98,7 +98,7 @@ cd "${REPO_DIR}"
 echo "Repo: $(pwd)"
 echo "Latest commit: $(git log --oneline -1)"
 
-pip install --quiet -e ".[dev]"
+uv sync
 echo "Project installed in editable mode."
 
 # ── 5. HuggingFace credentials ───────────────────────────────────────────────
