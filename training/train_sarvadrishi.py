@@ -447,7 +447,11 @@ def _load_reward_model(reward_model_path: str):
         return None, None
     try:
         from transformers import AutoModelForSequenceClassification, AutoTokenizer  # type: ignore[import]
-        rm = AutoModelForSequenceClassification.from_pretrained(reward_model_path)
+        rm = AutoModelForSequenceClassification.from_pretrained(
+            reward_model_path,
+            num_labels=1,
+            ignore_mismatched_sizes=True,
+        )
         rt = AutoTokenizer.from_pretrained(reward_model_path)
         log.info("Loaded reward model from %s", reward_model_path)
         return rm, rt
@@ -609,7 +613,48 @@ def _parse_args() -> argparse.Namespace:
                         help="Directory containing per-agent adapter subdirs")
     parser.add_argument("--reward_model_path", type=str, default=_DEFAULT_REWARD_MODEL_PATH)
     parser.add_argument("--push_to_hub", action="store_true")
+    parser.add_argument("--load_adapters_from_hub", action="store_true",
+                        help="Download sub-agent LoRA adapters from HF Hub before training.")
     return parser.parse_args()
+
+
+def _download_adapters_from_hub(output_dir: str) -> str:
+    """
+    Download all 8 sub-agent LoRA adapters from HF Hub.
+
+    Downloads D3V1601/VyomRaksha-{agent}-lora for each agent into
+    output_dir/downloaded_adapters/{agent}/.  Returns the path to
+    the downloaded_adapters directory.
+
+    Each download is individually wrapped in try/except so a single
+    failure just logs a warning — rule-based fallback still works.
+    """
+    try:
+        from huggingface_hub import snapshot_download  # type: ignore[import]
+    except ImportError:
+        log.warning("huggingface_hub not installed — cannot download adapters")
+        return ""
+
+    adapters_dir = os.path.join(output_dir, "downloaded_adapters")
+    os.makedirs(adapters_dir, exist_ok=True)
+
+    for agent_name in _AGENT_NAMES:
+        repo_id = f"D3V1601/VyomRaksha-{agent_name}-lora"
+        local_dir = os.path.join(adapters_dir, agent_name)
+        try:
+            snapshot_download(
+                repo_id=repo_id,
+                local_dir=local_dir,
+                local_dir_use_symlinks=False,
+            )
+            log.info("Downloaded adapter for %s from %s", agent_name, repo_id)
+        except Exception as exc:
+            log.warning(
+                "Failed to download adapter for %s from %s: %s — will use rule-based fallback",
+                agent_name, repo_id, exc,
+            )
+
+    return adapters_dir
 
 
 def main() -> None:
@@ -617,12 +662,17 @@ def main() -> None:
     model_id = _MODEL_IDS[args.model_size]
     log.info("SarvaDrishti training: model=%s steps=%d batch=%d", model_id, args.steps, args.batch_size)
 
+    # Resolve sub-agent adapter checkpoints
+    sub_agent_checkpoints = args.sub_agent_checkpoints
+    if args.load_adapters_from_hub and not sub_agent_checkpoints:
+        sub_agent_checkpoints = _download_adapters_from_hub(args.output_dir)
+
     try:
         model, tokenizer, is_unsloth = _load_model_and_tokenizer(model_id)
     except ImportError as exc:
         log.warning("Model load failed (%s) — minimal smoke-test mode", exc)
-        env = MultiAgentEpisodeEnv(args.sub_agent_checkpoints)
-        reward_fn = _make_sarvadrishi_reward_fn(None, None, args.sub_agent_checkpoints)
+        env = MultiAgentEpisodeEnv(sub_agent_checkpoints)
+        reward_fn = _make_sarvadrishi_reward_fn(None, None, sub_agent_checkpoints)
         _minimal_smoke_loop(env, reward_fn, args.steps, args.batch_size)
         log.info("Smoke-test complete — no checkpoint saved")
         return
@@ -632,7 +682,7 @@ def main() -> None:
         model=model, tokenizer=tokenizer,
         steps=args.steps, batch_size=args.batch_size,
         output_dir=args.output_dir,
-        sub_agent_checkpoints=args.sub_agent_checkpoints,
+        sub_agent_checkpoints=sub_agent_checkpoints,
         reward_model_path=args.reward_model_path,
         push_to_hub=args.push_to_hub,
         is_unsloth=is_unsloth,

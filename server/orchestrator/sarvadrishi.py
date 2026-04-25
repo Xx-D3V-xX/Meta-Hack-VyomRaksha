@@ -124,10 +124,37 @@ class SarvaDrishti:
         """
         self._step_count += 1
 
-        # --- 1. Update strategy ---
+        # --- 1. Capture PRE-update strategy for conflict resolution ---
         emergency_triggered = bool(emergency_notifications)
         urgency_alerts = self._build_urgency_alerts(recommendations)
 
+        pre_update_strategy = self._strategy_manager.current_strategy
+        pre_update_weights = self._strategy_manager.get_priority_weights()
+
+        log.debug(
+            "SarvaDrishti deliberate step=%d strategy=%s recs=%d emergencies=%d",
+            self._step_count, pre_update_strategy,
+            len(recommendations), len(emergency_notifications),
+        )
+
+        # --- 2. Handle cascade alerts from Threat Sub-Agent ---
+        cascade_injected = self._inject_cascade_urgency(recommendations)
+
+        # --- 3. Detect and resolve conflicts (using PRE-update strategy) ---
+        conflicts = self._conflict_resolver.detect_conflicts(recommendations)
+        conflict_types = [c.conflict_type for c in conflicts]
+
+        approved_action, resolution_reasoning, override_details = (
+            self._conflict_resolver.resolve(
+                conflicts,
+                recommendations,
+                pre_update_strategy,
+                pre_update_weights,
+                self._earth_directive,
+            )
+        )
+
+        # --- 4. NOW update strategy (after conflict resolution) ---
         self._strategy_manager.update_strategy_reactive(
             emergency_triggered, urgency_alerts
         )
@@ -138,30 +165,7 @@ class SarvaDrishti:
         current_strategy = self._strategy_manager.current_strategy
         priority_weights = self._strategy_manager.get_priority_weights()
 
-        log.debug(
-            "SarvaDrishti deliberate step=%d strategy=%s recs=%d emergencies=%d",
-            self._step_count, current_strategy,
-            len(recommendations), len(emergency_notifications),
-        )
-
-        # --- 2. Handle cascade alerts from Threat Sub-Agent ---
-        cascade_injected = self._inject_cascade_urgency(recommendations)
-
-        # --- 3. Detect and resolve conflicts ---
-        conflicts = self._conflict_resolver.detect_conflicts(recommendations)
-        conflict_types = [c.conflict_type for c in conflicts]
-
-        approved_action, resolution_reasoning, override_details = (
-            self._conflict_resolver.resolve(
-                conflicts,
-                recommendations,
-                current_strategy,
-                priority_weights,
-                self._earth_directive,
-            )
-        )
-
-        # --- 4. Determine conflict metadata for the decision ---
+        # --- 5. Determine conflict metadata for the decision ---
         conflict_detected = bool(conflicts)
         conflict_type_str: str | None = None
         if conflicts:
@@ -172,7 +176,7 @@ class SarvaDrishti:
         if override_details:
             override_reasoning = resolution_reasoning
 
-        # --- 5. Log the decision ---
+        # --- 6. Log the decision ---
         log.info(
             "SarvaDrishti step=%d approved='%s' strategy=%s conflict=%s",
             self._step_count, approved_action, current_strategy,

@@ -278,14 +278,6 @@ class R2ProbeSimulator(ProbeSimulator):
             error = f"Unknown R2 action type: {action_type}"
             log.warning(error)
 
-        # Passive auto-recovery each step
-        self.compute_auto_recovery()
-
-        # Apply R2 guard rails
-        self._apply_r2_guard_rails()
-
-        self.step_count += 1
-
         snap_after = self._r2_resource_snapshot()
         delta = self._compute_delta(snap_before, snap_after)
         delta["error"] = error

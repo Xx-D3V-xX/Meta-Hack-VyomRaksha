@@ -22,7 +22,7 @@
       "deadline_min": 90
     }
   ],
-  "comms_windows": [],
+  "comms_windows": [{"open_at": 50, "close_at": 70}],
   "eclipse_periods": [
     {"start": 100, "end": 130}
   ],
