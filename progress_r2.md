@@ -823,6 +823,40 @@ Fixed all 5 pre-AWS bugs and created the 3 new AWS training files.
 
 **Next session:** Launch 3 AWS EC2 instances per `training/aws/README.md`.
 
+### Session Critical Bug Fixes — 2026-04-26
+**What was done:**
+Fixed 6 critical bugs identified during pre-Phase-2-retraining audit.
+
+**Bugs fixed:**
+
+- **Bug 3 — `training/train_sarvadrishi.py`:** Verified already fixed. `_load_reward_model()` already uses `num_labels=1, ignore_mismatched_sizes=True` in `AutoModelForSequenceClassification.from_pretrained()`. No change needed.
+
+- **Bug 11 — `server/probe_sim_r2.py`:** Verified already fixed. `apply_r2_action()` does NOT contain `compute_auto_recovery()`, `_apply_r2_guard_rails()`, or `step_count += 1` — these are correctly called externally by `multi_agent_loop.py` (lines 290–292). Fixed one test (`test_threat_assess_quick_costs_compute`) that was asserting auto-recovery ran inside `apply_r2_action()`.
+
+- **Bug 13 — `missions/task5_cascade.json`:** Added comms window `{"open_at": 50, "close_at": 70}` to the `comms_windows` array. Gives Communications Sub-Agent a 20-minute transmission window during the recovery phase between the debris cascade (T+25) and the secondary solar flare (T+65).
+
+- **Bug 14 — `server/shadow_sim.py`:** Fixed `ShadowSimulator.run()` outcome_delta computation. Added `post_emergency_state` parameter to the method signature. The old code used `state_at_n` (pre-emergency) as "actual", which was backwards. Now uses `post_emergency_state._r2_resource_snapshot()` if provided, otherwise falls back to `state_at_n`. Changed `actual_snap[key]` to `actual_snap.get(key, 0.0)` for safety.
+
+- **Bug 15 — `server/multi_agent_loop.py`:** Wired the shadow simulator into `_run_emergency_cycle()`. Previously `_shadow_sim` was instantiated but never called. Now: (1) imported `SARVADRISHI_RESPONSE_LATENCY`, (2) shadow sim runs BEFORE `execute()` with `without_action=winner.action`, (3) after execute, recomputes `outcome_delta` using actual post-emergency state, (4) stores `shadow_result` in notification dict, (5) returns `shadow_result` as third element of tuple, (6) `run_step()` stores as `_last_shadow_result`, (7) added `last_shadow_result` property for reward computation access.
+
+- **Bug 21 — `server/r2_environment.py`:** Fixed `_build_r2_initial_observation()` field names. Changed `power` → `power_level`, `fuel` → `fuel_remaining`, `time` → `time_remaining` (with `int()` cast). Removed forbidden top-level fields (`mission_failed`, `failure_reason`, `episode_done`, `stalling`, `consecutive_defers`) and replaced with `done=False` + `metadata` dict containing those fields. Matches the canonical `ProbeObservation` base class field names and `extra="forbid"` constraint.
+
+**Files modified:**
+- `server/shadow_sim.py` — Bug 14 fix
+- `server/multi_agent_loop.py` — Bug 15 fix
+- `server/r2_environment.py` — Bug 21 fix
+- `missions/task5_cascade.json` — Bug 13 fix
+- `tests/test_probe_sim_r2.py` — Test fix for Bug 11 (test was wrong, not code)
+
+**Files verified already correct (no changes needed):**
+- `training/train_sarvadrishi.py` — Bug 3 already fixed
+- `server/probe_sim_r2.py` — Bug 11 already fixed
+
+**Test results:**
+- `pytest tests/ -q --tb=short` → **1019/1019 passed in 19.80s**
+
+**Next session:** Launch Phase 2 retraining on AWS EC2 instances.
+
 <!-- Copy the session block above for each new session -->
 
 ---

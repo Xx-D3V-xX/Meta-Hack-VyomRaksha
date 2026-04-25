@@ -199,9 +199,9 @@ class TestComputeActions:
         sim = make_sim()
         before = sim.compute_budget
         sim.apply_r2_action("threat_assess_quick", {})
-        # compute decreases by COST_QUICK, then recovery adds COMPUTE_RECOVERY_RATE
-        expected = before - COMPUTE_COST_QUICK + COMPUTE_RECOVERY_RATE
-        assert abs(sim.compute_budget - min(COMPUTE_BUDGET_INITIAL, expected)) < 0.1
+        # compute decreases by COST_QUICK; auto-recovery is NOT called inside apply_r2_action
+        expected = before - COMPUTE_COST_QUICK
+        assert abs(sim.compute_budget - max(0.0, expected)) < 0.1
 
     def test_threat_assess_deep_costs_more_than_quick(self):
         sim1 = make_sim()

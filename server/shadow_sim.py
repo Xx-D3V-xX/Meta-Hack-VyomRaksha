@@ -97,6 +97,7 @@ class ShadowSimulator:
         self,
         step_n: int,
         state_at_n: R2ProbeSimulator,
+        post_emergency_state: R2ProbeSimulator | None = None,
         latency_steps: int = SHADOW_SIM_DEPTH,
         without_action: str = "",
     ) -> ShadowResult:
@@ -106,13 +107,17 @@ class ShadowSimulator:
 
         Parameters
         ----------
-        step_n        : current environment step number (for logging)
-        state_at_n    : the R2ProbeSimulator snapshot at the moment the
-                        emergency fired (will be deep-copied, not mutated)
-        latency_steps : how many steps to project forward
-                        (defaults to SHADOW_SIM_DEPTH = SARVADRISHI_RESPONSE_LATENCY)
-        without_action: name of the emergency action that was NOT taken
-                        (informational — used for logging and outcome_delta)
+        step_n              : current environment step number (for logging)
+        state_at_n          : the R2ProbeSimulator snapshot at the moment the
+                              emergency fired (will be deep-copied, not mutated)
+        post_emergency_state: the simulator AFTER the emergency action was
+                              executed. If provided, this is used as the
+                              "actual" state for outcome_delta computation.
+                              If None, falls back to state_at_n.
+        latency_steps       : how many steps to project forward
+                              (defaults to SHADOW_SIM_DEPTH = SARVADRISHI_RESPONSE_LATENCY)
+        without_action      : name of the emergency action that was NOT taken
+                              (informational — used for logging and outcome_delta)
 
         Returns
         -------
@@ -151,12 +156,15 @@ class ShadowSimulator:
 
         resource_failure_occurred = failure_step is not None
 
-        # outcome_delta: compare shadow end-state to actual post-emergency state
-        # (actual state is state_at_n since the shadow is the counterfactual)
-        actual_snap = state_at_n._r2_resource_snapshot()
-        shadow_snap = trajectory[-1] if trajectory else actual_snap
+        # outcome_delta: compare actual post-emergency state to shadow end-state
+        # Positive delta = emergency made the resource better than doing nothing
+        if post_emergency_state is not None:
+            actual_snap = post_emergency_state._r2_resource_snapshot()
+        else:
+            actual_snap = state_at_n._r2_resource_snapshot()
+        shadow_snap = trajectory[-1] if trajectory else state_at_n._r2_resource_snapshot()
         outcome_delta = {
-            key: round(actual_snap[key] - shadow_snap[key], 4)
+            key: round(actual_snap.get(key, 0.0) - shadow_snap.get(key, 0.0), 4)
             for key in actual_snap
         }
 

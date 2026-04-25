@@ -40,6 +40,7 @@ from models_r2 import (
 )
 from server.r2_constants import (
     EMERGENCY_PRIORITY_ORDER,
+    SARVADRISHI_RESPONSE_LATENCY,
 )
 from server.orchestrator.emergency_handler import EmergencyHandler
 from server.orchestrator.sarvadrishi import SarvaDrishti
@@ -147,14 +148,17 @@ def _domain_state_for_agent(
         return state
     if agent_id == "threat":
         # Threat agent reads from global snapshot — domain_state is sensor data
+        # Use low background noise so the agent always has a minimal active
+        # signal and produces consistent rule-based recommendations (Bug 20).
+        # The actual threat_event dict overrides these when a mission event fires.
         return {
-            "sensor_signal": 0.0,
-            "threat_type": "none",
-            "threat_severity": 0.0,
+            "sensor_signal": 0.05,          # low background noise, not zero
+            "threat_type": "background",
+            "threat_severity": 0.02,
             "time_to_impact": 999.0,
             "affected_domains": [],
-            "confidence_pct": 0.0,
-            "level": 0.0,
+            "confidence_pct": 5.0,          # minimal background confidence
+            "level": 5.0,
             "rate_of_change": 0.0,
             "critical_threshold": 0.0,
         }
@@ -221,6 +225,9 @@ class MultiAgentLoop:
         # Cascade alert overrides from previous Threat Sub-Agent recommendation
         self._pending_cascade_overrides: dict[str, float] = {}
 
+        # Episode log for grader — list of per-step dicts
+        self._episode_log: list[dict] = []
+
         log.debug(
             "MultiAgentLoop init: %d sub-agents, sarvadrishi=%s",
             len(sub_agents), type(self._sarvadrishi).__name__,
@@ -263,7 +270,8 @@ class MultiAgentLoop:
         recommendations = self._collect_recommendations(threat_event)
 
         # ---- Steps 4–7: Emergency scan, resolve, execute, notify ----
-        emergency_notifications, emergency_fired = self._run_emergency_cycle()
+        emergency_notifications, emergency_fired, shadow_result = self._run_emergency_cycle()
+        self._last_shadow_result = shadow_result
 
         # ---- Step 8: SarvaDrishti deliberates on post-emergency reality ----
         r2_state = self._probe.get_r2_resource_state()
@@ -299,6 +307,13 @@ class MultiAgentLoop:
             emergency_notifications=emergency_notifications,
             emergency_fired=emergency_fired,
         )
+
+        # ---- Build step log entry for grader ----
+        step_log = self._build_step_log_entry(
+            action, decision, recommendations,
+            emergency_notifications, emergency_fired,
+        )
+        self._episode_log.append(step_log)
 
         done = self._probe.episode_done or self._probe.mission_failed
         return observation, 0.0, done
@@ -348,29 +363,57 @@ class MultiAgentLoop:
 
         return recommendations
 
-    def _run_emergency_cycle(self) -> tuple[list[dict[str, Any]], bool]:
+    def _run_emergency_cycle(self) -> tuple[list[dict[str, Any]], bool, Any]:
         """
         Steps 4–7: scan → resolve → execute → notify.
 
         Returns
         -------
-        (emergency_notifications, emergency_fired)
+        (emergency_notifications, emergency_fired, shadow_result)
         """
         events = self._emergency_handler.scan(list(self._sub_agents.values()))
         winner = self._emergency_handler.resolve_simultaneous(events)
 
         if winner is None:
-            return [], False
+            return [], False, None
+
+        # Run shadow sim to determine if emergency is justified
+        shadow_result = None
+        if winner is not None:
+            try:
+                shadow_result = self._shadow_sim.run(
+                    step_n=self._step_count,
+                    state_at_n=self._probe,
+                    latency_steps=SARVADRISHI_RESPONSE_LATENCY,
+                    without_action=winner.action,
+                )
+            except Exception as exc:
+                log.warning("Shadow sim failed: %s — skipping shadow result", exc)
 
         result = self._emergency_handler.execute(winner, self._probe)
+
+        # Now we have post-emergency state — update shadow result with correct delta
+        if shadow_result is not None:
+            try:
+                post_snap = self._probe._r2_resource_snapshot()
+                pre_snap = result.resource_state_after  # this is actually post-emergency
+                shadow_end = shadow_result.trajectory[-1] if shadow_result.trajectory else pre_snap
+                shadow_result.outcome_delta = {
+                    k: round(post_snap.get(k, 0.0) - shadow_end.get(k, 0.0), 4)
+                    for k in post_snap
+                }
+            except Exception:
+                pass
+
         notification = self._emergency_handler.build_post_emergency_notification(result)
+        notification["shadow_result"] = shadow_result  # None if sim failed
 
         log.info(
             "Step %d | Emergency: agent=%s action=%s success=%s",
             self._step_count, winner.agent_id, winner.action, result.success,
         )
 
-        return [notification], True
+        return [notification], True, shadow_result
 
     def _extract_and_store_cascade_alerts(
         self,
@@ -484,3 +527,87 @@ class MultiAgentLoop:
             if rec.urgency > 0.3 or rec.recommended_action != "defer":
                 involved.add(rec.agent_id)
         return sorted(involved)
+
+    @property
+    def last_shadow_result(self):
+        """Return the shadow simulation result from the most recent emergency cycle."""
+        return getattr(self, "_last_shadow_result", None)
+
+    @property
+    def episode_log(self) -> list[dict]:
+        """Return the accumulated episode log for grader consumption."""
+        return self._episode_log
+
+    def reset_episode_log(self) -> None:
+        """Clear the episode log (called on environment reset)."""
+        self._episode_log = []
+
+    def _build_step_log_entry(
+        self,
+        action: str,
+        decision: SarvaDrishtiDecision,
+        recommendations: list[SubAgentRecommendation],
+        emergency_notifications: list[dict[str, Any]],
+        emergency_fired: bool,
+    ) -> dict:
+        """
+        Build a single step log dict containing every field the R2 graders read.
+
+        This is the critical bridge between the multi-agent cycle and
+        grade_r2_episode().  Without these fields, Tasks 4/5 score ≈ 0.
+        """
+        crisis_opportunity = any(r.urgency > 0.85 for r in recommendations)
+        highest_urgency_rec = (
+            max(recommendations, key=lambda r: r.urgency)
+            if recommendations
+            else None
+        )
+        r2_state = self._probe.get_r2_resource_state()
+
+        return {
+            "step": self._step_count,
+            "action_type": decision.approved_action,
+            # ---- coordination fields ----
+            "conflict_detected": decision.conflict_detected,
+            "conflict_resolved_correctly": (
+                decision.conflict_detected and decision.approved_action != "defer"
+            ),
+            "conflict_type": decision.conflict_type,
+            # ---- emergency fields ----
+            "emergency_invoked": emergency_fired,
+            "emergency_correct": (
+                emergency_fired
+                and self._last_shadow_result is not None
+                and self._last_shadow_result.resource_failure_occurred
+                and not self._last_shadow_result.sarvadrishi_would_have_acted
+            ),
+            "crisis_opportunity": crisis_opportunity,
+            "emergency_fired_for_crisis": emergency_fired and crisis_opportunity,
+            # ---- cascade fields ----
+            "cascade_alert_received": bool(self._pending_cascade_overrides),
+            "cascade_handled_correctly": (
+                bool(self._pending_cascade_overrides)
+                and any(
+                    r.agent_id in ("structural", "probe_systems") and r.urgency > 0.5
+                    for r in recommendations
+                )
+            ),
+            # ---- strategy / override fields ----
+            "sarvadrishi_strategy": decision.current_strategy,
+            "override_invoked": decision.override_reasoning is not None,
+            "override_justified": (
+                decision.override_reasoning is not None
+                and any(r.urgency >= 0.75 for r in recommendations)
+            ),
+            "sub_agent_urgency_calibrated": (
+                highest_urgency_rec is not None
+                and highest_urgency_rec.recommended_action == decision.approved_action
+            ),
+            # ---- mission / resource fields ----
+            "mission_failed": self._probe.mission_failed,
+            "power_level": round(r2_state.power, 4),
+            "fuel_remaining": round(r2_state.fuel, 4),
+            "structural_integrity": round(r2_state.structural_integrity, 4),
+            "thermal": round(r2_state.thermal, 4),
+            "objectives": [],
+        }

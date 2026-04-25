@@ -104,6 +104,9 @@ class R2VyomRakshaEnvironment(VyomRakshaEnvironment):
         self._is_r2_task: bool = False
         self._last_r2_obs: R2ProbeObservation | None = None
         self._r2_total_reward: float = 0.0
+        # Cascade chain causality tracking (Gap 10)
+        self._primary_event_step: int = -1
+        self._cascade_chain_active: bool = False
 
     # ------------------------------------------------------------------
     # OpenEnv interface — reset
@@ -138,6 +141,7 @@ class R2VyomRakshaEnvironment(VyomRakshaEnvironment):
         # Initialise SarvaDrishti and MultiAgentLoop
         sarvadrishi = SarvaDrishti()
         self._loop = MultiAgentLoop(self._r2_sim, sub_agents, sarvadrishi)
+        self._loop.reset_episode_log()
 
         # Check comms window at T=0
         comms_open = self._r2_comms_window_open(elapsed=0)
@@ -223,11 +227,13 @@ class R2VyomRakshaEnvironment(VyomRakshaEnvironment):
             r2_resources: dict = {}
             r2_total_reward: float = 0.0
             task_id: int = 4
+            episode_log: list = []
 
         return R2State(
             r2_resources=r2_state.model_dump(),
             r2_total_reward=round(self._r2_total_reward, 6),
             task_id=self._task_id,
+            episode_log=self._loop.episode_log if self._loop else [],
         )
 
     # ------------------------------------------------------------------
@@ -270,14 +276,16 @@ class R2VyomRakshaEnvironment(VyomRakshaEnvironment):
         """Build the zero-step observation after reset() for R2 tasks."""
         assert self._r2_sim is not None
         return R2ProbeObservation(
-            power=round(self._r2_sim.power, 4),
-            fuel=round(self._r2_sim.fuel, 4),
-            time=self._r2_sim.time,
-            mission_failed=False,
-            failure_reason="",
-            episode_done=False,
-            stalling=False,
-            consecutive_defers=0,
+            power_level=round(self._r2_sim.power, 4),
+            fuel_remaining=round(self._r2_sim.fuel, 4),
+            time_remaining=int(self._r2_sim.time),
+            done=False,
+            metadata={
+                "mission_failed": False,
+                "failure_reason": "",
+                "stalling": False,
+                "consecutive_defers": 0,
+            },
             thermal=round(self._r2_sim.thermal, 4),
             compute_budget=round(self._r2_sim.compute_budget, 4),
             structural_integrity=round(self._r2_sim.structural_integrity, 4),
@@ -397,6 +405,31 @@ class R2VyomRakshaEnvironment(VyomRakshaEnvironment):
                 "affected_domains": self._infer_affected_domains(damage),
                 "confidence_pct": min(100.0, intensity * 100.0),
             }
+
+            # ---- Cascade chain causality detection (Gap 10) ----
+            CASCADE_WINDOW = 10  # steps
+            elapsed_since_primary = elapsed - self._primary_event_step
+            is_cascade = (
+                0 < elapsed_since_primary <= CASCADE_WINDOW
+                and self._primary_event_step >= 0
+                and len(self._applied_events) > 1
+            )
+            if not is_cascade:
+                self._primary_event_step = elapsed
+                self._cascade_chain_active = False
+            else:
+                self._cascade_chain_active = True
+
+        # Annotate episode log with cascade chain info
+        if self._cascade_chain_active and self._loop:
+            if self._loop.episode_log:
+                self._loop.episode_log[-1]["cascade_chain_triggered"] = True
+                if (
+                    self._r2_sim is not None
+                    and self._r2_sim.structural_integrity > 30.0
+                    and self._r2_sim.thermal < 95.0
+                ):
+                    self._loop.episode_log[-1]["cascade_chain_resolved"] = True
 
         return threat_event
 
