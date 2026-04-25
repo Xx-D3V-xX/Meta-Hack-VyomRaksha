@@ -26,6 +26,9 @@ server/multi_agent_loop.py
 server/probe_sim.py
 server/probe_sim_r2.py
 server/r2_constants.py
+server/r2_environment.py
+server/r2_graders.py
+server/r2_reward.py
 server/reward.py
 server/shadow_sim.py
 server/threat_pipeline.py
@@ -40,6 +43,9 @@ tests/test_multi_agent_loop.py
 tests/test_orchestrator.py
 tests/test_pipeline.py
 tests/test_probe_sim_r2.py
+tests/test_r2_graders.py
+tests/test_r2_reward.py
 tests/test_resources.py
 tests/test_reward.py
 tests/test_sub_agents.py
+tests/test_training_scripts.py
