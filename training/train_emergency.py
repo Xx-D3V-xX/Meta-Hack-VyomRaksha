@@ -365,7 +365,7 @@ def _run_agent_grpo(model, tokenizer, agent_name: str, steps: int, reward_fn, ou
             max_steps=steps,
             per_device_train_batch_size=1,
             num_generations=1,
-            max_prompt_length=512,
+            
             max_completion_length=256,
             learning_rate=1e-5,
             logging_steps=1,
