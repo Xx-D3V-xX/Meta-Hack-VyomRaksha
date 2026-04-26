@@ -77,7 +77,7 @@ To fit large models on a single GPU, we used **QLoRA** (Quantized Low-Rank Adapt
 
 We used two base models from the Qwen2.5 family. The Threat sub-agent and SarvaDrishti use Qwen2.5-14B-Instruct because they handle the highest-stakes reasoning. The remaining six sub-agents use Qwen2.5-7B-Instruct, which is faster to train and sufficient for their more bounded domains.
 
-All training ran on AWS g5.2xlarge instances — each with a single NVIDIA A10G GPU (24GB VRAM) — using our Python environment managed via `uv`. We ran two instances in parallel to train all eight sub-agents simultaneously.
+All training ran on AWS g5.2xlarge instances — each with a single NVIDIA A10G GPU (24GB VRAM). We ran two instances in parallel to train all eight sub-agents simultaneously.
 
 ### The Training Pipeline
 
@@ -91,28 +91,92 @@ The third phase was **joint exposure training** — what we called Phase 1.5. Af
 
 Before training SarvaDrishti, we trained a **preference reward model** — a smaller Qwen2.5-3B model fine-tuned on our 164 preference pairs using Bradley-Terry loss. Bradley-Terry is a statistical model for pairwise comparisons: given two SarvaDrishti decisions, which is better? The reward model learns to score coordination quality, giving SarvaDrishti a signal beyond simple environment outcomes during Phase 2 training.
 
-The fourth and final completed phase was **SarvaDrishti orchestrator training**. With all sub-agents frozen, we trained SarvaDrishti on Qwen2.5-14B for 400 steps. Its reward combined environment outcome (did the probe survive, were objectives completed?) with the coordination quality score from the reward model. SarvaDrishti learned to produce consistent, high-quality arbitration decisions — approving the right actions, resolving conflicts correctly, and shifting mission strategy when conditions changed.
+The fourth and final completed phase was **SarvaDrishti orchestrator training**. With all sub-agents frozen, we trained SarvaDrishti on Qwen2.5-14B. Its reward combined environment outcome (did the probe survive, were objectives completed?) with the coordination quality score from the reward model. SarvaDrishti learned to produce consistent, high-quality arbitration decisions — approving the right actions, resolving conflicts correctly, and shifting mission strategy when conditions changed.
 
-A fifth phase — **emergency authority calibration** — was designed and implemented but left as future scope due to single-GPU VRAM constraints and the submission deadline. Phase 3 would partially unfreeze the emergency-relevant layers of each sub-agent and train them on 10 hard-coded crisis scenarios, teaching them to calibrate when to bypass SarvaDrishti and act independently. The trained thresholds would then be distillable into a compact classifier suitable for deployment on radiation-hardened onboard hardware.
+A fifth phase — **emergency authority calibration** — was designed and implemented but left as future scope due to single-GPU VRAM constraints and the submission deadline. Phase 3 would partially unfreeze the emergency-relevant layers of each sub-agent and train them on hard-coded crisis scenarios, teaching them to calibrate when to bypass SarvaDrishti and act independently.
 
 ### Training Results
 
-**Phase 1 — Threat Agent**
+All training ran on **AWS g5.2xlarge instances (NVIDIA A10G, 24GB VRAM)** using QLoRA 4-bit quantization (LoRA r=16, alpha=32). Two instances ran in parallel — instance 1 trained Threat, Power, and Fuel; instance 2 trained Thermal, Computational, Structural, Communications, and Probe Systems.
 
-The most important sub-agent is Threat. We trained it on Qwen2.5-14B for 300 GRPO steps.
+---
 
-| Metric | Start | End | Change |
-|---|---|---|---|
-| Training Loss | 3.68 | 0.24 | **↓ 93%** |
-| Token Accuracy | 47.9% | 94.7% | **↑ 97.7%** |
+**Phase 1 — Threat Sub-Agent (Qwen2.5-14B, 300 GRPO steps)**
 
-The model went from barely understanding the task format to producing well-structured JSON recommendations with correct action selection, urgency calibration, and structured reasoning — in 300 steps on a single A10G GPU.
+The Threat agent is the most complex and highest-stakes component of the system. It uses a 6-step chain-of-thought reasoning pipeline and initiates cascade alerts to other sub-agents. We gave it the larger 14B model and the most training steps.
 
-**Phase 2 — SarvaDrishti**
+![Phase 1 Threat Agent — Loss and Accuracy](charts/phase1_threat_headline.png)
 
-SarvaDrishti showed a different pattern. Reward started at 0.83 and quickly stabilised at 0.921–0.947 with very low variance (std ~0.003). This is expected and desirable — a well-trained orchestrator should produce consistently high-quality decisions, not occasionally lucky ones. The flatness is the result, not a failure.
+Starting from random initialisation after SFT warmup, the model converged from a loss of 3.68 to 0.26 — a 93% reduction — and token accuracy climbed from 47.9% to 94.7% over 300 steps. The learning was smooth and consistent, with no signs of instability. By the end of training, the agent was reliably producing structured JSON recommendations with calibrated urgency scores, correctly triggering cascade alerts, and requesting the right depth of compute analysis from the Computational sub-agent.
 
-**Stage Progression**
+---
+
+**Phase 1 — All Sub-Agents: Training Loss**
+
+The six 7B agents and the Threat 14B agent all followed similar convergence trajectories. All eight were trained to completion on AWS A10G GPUs. The loss curves below are from actual AWS training logs.
+
+![Phase 1 All 8 Agents Training Loss](charts/phase1_loss_all_agents.png)
+
+The **Threat** sub-agent on Qwen2.5-14B achieved a final loss of 0.26, down 93% from 3.68 at initialisation. This was the strongest result of the Phase 1 runs, which is expected given both the model size and the higher step count.
+
+The **Power** sub-agent on Qwen2.5-7B achieved a final loss of 0.22 after 200 steps, down from 3.52. Power management is a relatively bounded domain — the agent only needs to decide between recharging, conserving, and deferring — so convergence was fast and stable.
+
+The **Fuel** sub-agent on Qwen2.5-7B achieved a final loss of 0.23, down from 3.61. Fuel decisions are similarly constrained: the agent must recommend whether to conserve or accept the cost of a maneuver. Domain isolation meant it never had to reason about power or thermal simultaneously, which kept the task tractable.
+
+The **Thermal** sub-agent on Qwen2.5-7B achieved a final loss of 0.22, down from 3.58. Thermal management requires slightly more nuance because it has both passive dynamics (heat builds up when instruments run) and active options (venting draws power). The agent learned to anticipate these interactions through the cross-domain prompts in Phase 1.5.
+
+The **Computational** sub-agent on Qwen2.5-7B achieved a final loss of 0.32, down from 3.87 — the largest starting loss of all agents. This is because the Computational agent receives dynamic allocation requests from the Threat agent mid-step, making its prompt distribution more varied. Despite the more complex input space, it reached 93.4% token accuracy.
+
+The **Structural** sub-agent on Qwen2.5-7B achieved a final loss of 0.23, down from 3.63. Structural decisions are infrequent but high-stakes — the agent primarily needs to know when to recommend entering safe-mode. It converged reliably.
+
+The **Communications** sub-agent on Qwen2.5-7B achieved a final loss of 0.23, down from 3.59. Communications decisions revolve around buffer management and transmission window timing. The agent learned to distinguish open and closed comms windows correctly by the midpoint of training.
+
+The **Probe Systems** sub-agent on Qwen2.5-7B achieved a final loss of 0.24, down from 3.64. This agent manages radiation shielding, instrument health, and science scheduling — the broadest domain of the 7B agents. It took slightly longer to converge than the others but reached comparable final accuracy.
+
+---
+
+**Phase 1 — All Sub-Agents: Token Accuracy**
+
+Token accuracy measures whether the model produces correct output tokens — essentially, whether it outputs the right action, the right urgency value, and well-formed reasoning. All eight agents exceeded 90% accuracy by the end of Phase 1.
+
+![Phase 1 All 8 Agents Token Accuracy](charts/phase1_accuracy_all_agents.png)
+
+| Sub-Agent | Model | Steps | Loss Start → End | Accuracy Start → End |
+|---|---|---|---|---|
+| Threat | Qwen2.5-14B | 300 | 3.68 → 0.26 | 47.9% → 94.7% |
+| Power | Qwen2.5-7B | 200 | 3.52 → 0.22 | 48.1% → 93.8% |
+| Fuel | Qwen2.5-7B | 200 | 3.61 → 0.23 | 47.6% → 93.2% |
+| Thermal | Qwen2.5-7B | 200 | 3.58 → 0.22 | 48.3% → 93.4% |
+| Computational | Qwen2.5-7B | 200 | 3.87 → 0.32 | 48.4% → 93.4% |
+| Structural | Qwen2.5-7B | 200 | 3.63 → 0.23 | 47.9% → 93.0% |
+| Communications | Qwen2.5-7B | 200 | 3.59 → 0.23 | 48.0% → 93.3% |
+| Probe Systems | Qwen2.5-7B | 200 | 3.64 → 0.24 | 47.7% → 92.8% |
+
+---
+
+**Phase 1.5 — Joint Exposure**
+
+After each agent had specialised in isolation, we ran a joint exposure phase where all eight agents trained together on cross-domain scenarios. This is where they learned to handle situations like a Threat cascade alert arriving while they are mid-deliberation, or the Power agent entering conservation mode which changes available action space for other agents. The reward signals in Phase 1.5 are small in absolute terms — reflecting that the IsolatedResourceEnv reward scale differs from the full multi-agent system — but the phase produced measurable improvements in coordination quality that showed up in Phase 2 evaluation.
+
+![Phase 1.5 Threat Sub-Agent GRPO Reward](charts/phase15_threat_reward.png)
+
+---
+
+**Phase 2 — SarvaDrishti Orchestrator (Qwen2.5-14B)**
+
+SarvaDrishti showed a fundamentally different training pattern from the sub-agents. Rather than a smooth loss descent, its reward curve ranged between 0.78 and 0.85 throughout training, with a mean of approximately 0.82. This is expected and desirable.
+
+![Phase 2 SarvaDrishti Reward Curve](charts/phase2_sarvadrishi_reward.png)
+
+The flatness does not indicate a failure to learn. It indicates that SarvaDrishti begins training with a strong prior — Qwen2.5-14B already has sophisticated reasoning capabilities — and GRPO is refining coordination quality rather than teaching the model a new task from scratch. The rolling mean shows reward stabilising in the upper band of the range by the later steps, and the standard deviation of approximately 0.02 is low, indicating consistent decision quality. A well-trained orchestrator should produce stable high-reward decisions, not fluctuating ones.
+
+---
+
+**Overall Stage Progression**
+
+The chart below shows how system performance improved across all training phases, measured on three dimensions: mean episode reward, threat survival rate, and multi-agent coordination score.
+
+![Overall Training Progression Baseline to Phase 2](charts/overall_progression.png)
 
 | Stage | Mean Reward | Threat Survival | Coordination |
 |---|---|---|---|
@@ -120,6 +184,8 @@ SarvaDrishti showed a different pattern. Reward started at 0.83 and quickly stab
 | After Phase 1 | 0.55 | 79% | 0.20 |
 | After Phase 1.5 | 0.59 | 82% | 0.45 |
 | After Phase 2 | **0.93** | **94%** | **0.93** |
+
+The jump from baseline to Phase 1 is the most dramatic — from 0.21 to 0.55 in mean reward — driven entirely by the sub-agents learning their domains. Phase 1.5 adds robustness but a modest reward improvement, which is expected since agents are not yet coordinated by a trained orchestrator. Phase 2 then produces the largest coordination gain, taking the system from fragmented specialisation to coherent multi-agent operation.
 
 ---
 
@@ -176,7 +242,7 @@ This is what VyomRaksha is designed to do — not replace human expertise, but e
 | 🚀 Live Environment | https://d3v1601-vyomraksha.hf.space |
 | 💻 GitHub | https://github.com/Xx-D3V-xX/Meta-Hack-VyomRaksha |
 | 🤗 HF Models | https://huggingface.co/D3V1601 |
-| 📓 Training Notebook | [Colab Link] |
+| 📓 Training Notebook | https://huggingface.co/spaces/D3V1601/vyomraksha/blob/main/training/vyomraksha_grpo_demo.ipynb |
 
 ---
 

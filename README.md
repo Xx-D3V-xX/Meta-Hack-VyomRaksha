@@ -8,328 +8,201 @@ pinned: false
 app_port: 7860
 tags:
   - openenv
+  - multi-agent
+  - reinforcement-learning
+  - grpo
+  - space
 ---
 
-# VyomRaksha
+# VyomRaksha — व्योमरक्षा
 
-> *"Cosmic Protection"* — An OpenEnv environment for AI deep space mission operations
+> *"Cosmic Protection"* — A hierarchical multi-agent RL environment for autonomous deep space probe mission control.
 
-[![OpenEnv Compatible](https://img.shields.io/badge/OpenEnv-0.1%20Spec-blue)](https://github.com/meta-pytorch/OpenEnv)
-[![Hugging Face Space](https://img.shields.io/badge/HF%20Space-D3V1601%2Fvyomraksha-yellow)](https://huggingface.co/spaces/D3V1601/vyomraksha)
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-green)](https://python.org)
-
----
-
-## What Is This
-
-VyomRaksha is an OpenEnv-compliant reinforcement learning environment where an AI agent operates as the autonomous mission controller of a deep space probe. Named in the spirit of ISRO's Mangalyaan and Chandrayaan missions, the environment simulates the real operational logic that mission controllers at JPL, ISRO, and ESA deal with daily.
-
-The agent must allocate three onboard resources — **power**, **fuel**, and **time** — to accomplish science objectives while detecting, assessing, and responding to cosmic threats. Every decision has downstream consequences. There is no undo.
-
-The novel mechanic at the heart of VyomRaksha is the **AkashBodh threat detection pipeline** — a five-stage system (detect → triage → characterize → respond → comms) where information gathering itself has a cost. Spending power on triage gives better threat assessment, which requires less fuel for precise maneuvers. Skipping triage is faster but wastes fuel. The agent must find the optimal tradeoff under time pressure.
+[![OpenEnv](https://img.shields.io/badge/OpenEnv-6%2F6%20passing-brightgreen)](https://github.com/meta-pytorch/OpenEnv)
+[![HF Space](https://img.shields.io/badge/HF%20Space-Live-yellow)](https://huggingface.co/spaces/D3V1601/vyomraksha)
+[![Models](https://img.shields.io/badge/HF%20Hub-10%20adapters-blue)](https://huggingface.co/D3V1601)
+[![Hackathon](https://img.shields.io/badge/Meta%20PyTorch%20×%20Scaler-OpenEnv%202026-orange)](https://huggingface.co/spaces/D3V1601/vyomraksha)
 
 ---
 
-## Environment Overview
+## Links
 
-### The Two Layers
-
-| Layer | What It Models |
-|-------|---------------|
-| **Resource Layer** | What the probe owns: power %, fuel %, time remaining. Every action draws from this budget. |
-| **Environment Layer** | What space does to the probe: solar flares, debris fields, instrument anomalies. The agent cannot control this — only respond to it. |
-
-### Resources
-
-| Resource | Range | Failure Consequence |
-|----------|-------|-------------------|
-| Power (%) | 0–100 | Hits 0% → forced safe-mode → mission abort |
-| Fuel (%) | 0–100 | Exhausted mid-maneuver → trajectory loss → mission failure |
-| Time (min) | 0–T | Window closes → episode ends, incomplete objectives unscored |
-
-### The AkashBodh Threat Pipeline
-
-```
-[Detection] → [Triage] → [Characterization] → [Response] → [Comms Decision]
-     ↓              ↓               ↓                ↓              ↓
-  Passive       Power cost      More power        Fuel cost      Time cost
-  (free)        8–28%           (optional)        5–30%          15–45 min
-                                                  OR
-                                               Time cost (safe-mode)
-```
-
-Triage confidence determines maneuver precision:
-- **≥ 80% confidence** → precision burn (8% fuel)
-- **60–79% confidence** → standard burn (12% fuel)
-- **< 60% confidence** → blind burn (18% fuel) — only option if triage skipped
+| Resource | URL |
+|---|---|
+| 🚀 **Live Environment** | https://d3v1601-vyomraksha.hf.space |
+| 💻 **GitHub** | https://github.com/Xx-D3V-xX/Meta-Hack-VyomRaksha |
+| 🤗 **HF Models (10 adapters)** | https://huggingface.co/D3V1601 |
+| 📓 **Training Notebook (Colab)** | https://huggingface.co/spaces/D3V1601/vyomraksha/blob/main/training/vyomraksha_grpo_demo.ipynb |
+| 📝 **Blog Post** | https://huggingface.co/spaces/D3V1601/vyomraksha/blob/main/BLOG.md |
+| 📊 **Training Dashboard** | https://huggingface.co/spaces/D3V1601/vyomraksha/blob/main/dashboard/index.html |
 
 ---
 
-## Observation Space
+## The Problem
 
-Every `step()` and `reset()` returns a `ProbeObservation`:
+When a deep space probe is operating millions of kilometres from Earth, human experts at mission control face constant threats — debris fields, solar flares, thermal runaway, radiation spikes, instrument failures. The communication delay to Mars alone is 4 to 24 minutes one way. By the time a human instruction reaches the probe, the situation may have already changed.
 
-```python
-class ProbeObservation(BaseModel):
-    # Resources
-    power_level: float           # 0.0–100.0 (%)
-    fuel_remaining: float        # 0.0–100.0 (%)
-    time_remaining: int          # Mission window minutes left
-
-    # Science state
-    active_objectives: list[dict]  # [{id, name, priority, deadline_min, status}]
-    data_buffer: float             # 0.0–1.0 fill level (transmit urgency)
-    science_score: float           # Running mission yield 0.0–1.0
-
-    # Environment state
-    active_events: list[dict]      # [{type, time_to_impact, triage_confidence, stage}]
-    instrument_health: dict        # {camera, spectrometer, radar, drill} → 0.0–1.0
-    comms_blackout_in: int         # Minutes until next blackout (-1 if in blackout now)
-
-    # Agent helpers
-    telemetry_summary: str         # Natural language status (for LLM agents)
-    available_actions: list[str]   # What actions are currently valid
-    episode_done: bool
-    partial_score: float           # Running reward 0.0–1.0
-```
-
-**Example telemetry_summary:**
-```
-T+142min | Power: 67% | Fuel: 44% | Solar flare incoming T+23min
-(triage confidence: 45%) | HIGH priority geological survey available |
-Comms window open: 18min remaining
-```
+**VyomRaksha replaces human real-time decision-making with a trained multi-agent AI system** that operates entirely onboard, handling emergencies faster and with fewer errors than a human under time pressure.
 
 ---
 
-## Action Space
+## What VyomRaksha Is
 
-Every `step()` accepts a `ProbeAction`:
+VyomRaksha is an **OpenEnv-compliant hierarchical multi-agent RL environment** where a team of 8 specialist AI sub-agents and one orchestrator control a deep space probe in real time.
 
-```python
-class ProbeAction(BaseModel):
-    action_type: str   # One of the 8 types below
-    parameters: dict   # Action-specific params
+### The 8 Sub-Agents
+
+Each sub-agent observes **only its own resource domain** — domain isolation is a core design principle.
+
+| Sub-Agent | Domain | Emergency Authority |
+|---|---|---|
+| **Threat** | Debris tracking, solar flare detection, 6-step CoT pipeline | ✅ Direct + Cascade initiator |
+| **Power** | Battery levels, solar charging, power distribution | ✅ Direct |
+| **Fuel** | Thruster fuel, maneuver costs | ❌ No |
+| **Thermal** | Hull temperature, heater/cooler | ✅ Direct |
+| **Computational** | Onboard compute budget | ❌ No |
+| **Structural** | Hull integrity, safe-mode | ✅ Cascaded only |
+| **Communications** | Data buffer, transmission windows | ✅ Direct |
+| **Probe Systems** | Radiation shielding, instrument health, science | ✅ Direct |
+
+### SarvaDrishti — The Orchestrator
+
+SarvaDrishti (Sanskrit: *All-Seeing*) receives recommendations from all 8 sub-agents every step and arbitrates across 5 conflict types:
+
+- **Resource conflict** — two agents want the same resource simultaneously
+- **Exclusivity conflict** — two actions cannot both run in the same step
+- **Priority conflict** — a recommendation contradicts the current mission strategy
+- **Strategic override** — agent urgency ≥ 0.75 overrides mission strategy
+- **Earth directive override** — agent urgency ≥ 0.85 overrides standing ground control instructions
+
+### The Novel Mechanic — AkashBodh Emergency Authority
+
+When a sub-agent's domain crisis becomes critical, it **bypasses SarvaDrishti entirely** and acts unilaterally — without waiting for the orchestrator's approval. This emergency authority is **learned, not rule-based**, trained via Phase 3 GRPO calibration.
+
+A **Shadow Simulator** validates every emergency action counterfactually: "What would have happened if nothing was done?" This drives the emergency reward signal.
+
+### The Environment
+
+The probe operates in a physics-lite simulation with 7 resource domains:
+
+```
+Power (%)  ·  Fuel (%)  ·  Thermal (°C)  ·  Compute Budget
+Structural Integrity (%)  ·  Radiation Shielding (%)  ·  Data Buffer (%)
 ```
 
-| Action Type | Parameters | Primary Cost | Effect |
-|-------------|-----------|-------------|--------|
-| `run_instrument` | `instrument: str` | Power 5–18% | Adds science data to buffer, advances objective |
-| `run_triage` | `event_id: str`, `depth: str` (quick/deep/full) | Power 8–28% | Increases triage confidence on active threat |
-| `maneuver` | `event_id: str`, `type: str` (precision/standard/blind/emergency) | Fuel 5–30% | Resolves or reduces incoming threat |
-| `enter_safe_mode` | `mode: str` (instrument/full) | Time 20–40 min | Absorbs threat at reduced damage |
-| `transmit_data` | `batch: str` (priority/full/selective) | Time 15–35 min | Clears buffer, credits science score |
-| `notify_earth` | `urgency: str` (emergency/status) | Time 25–45 min | Mission safety credit |
-| `recharge` | — | Time 30 min | Power +20% (unavailable during eclipse) |
-| `defer` | — | Time 5 min | Hold and observe (penalty after 4 consecutive) |
+**5 progressive tasks:**
+
+| Task | Difficulty | What it tests |
+|---|---|---|
+| Task 1 | Easy | Routine science collection, resource management |
+| Task 2 | Medium | Science vs threat dilemma, competing priorities |
+| Task 3 | Hard | Full threat pipeline, cascading crisis |
+| Task 4 | Very Hard | Emergency authority mid-coordination |
+| Task 5 | Extreme | Debris → thermal spike → solar flare cascade |
+
+**OpenEnv compliance:** Single-agent external interface (OpenEnv sees one action in, one observation out). All 8 sub-agents + SarvaDrishti operate *inside* each `step()` call.
 
 ---
 
-## The Three Tasks
+## Training Results
 
-### Task 1 — Routine Operations (Easy)
+All training was run on **AWS g5.2xlarge (NVIDIA A10G 24GB VRAM)** using QLoRA + GRPO.
 
-Deep space probe. Power 88%, Fuel 95%, 480-minute window. No cosmic threats. Three science objectives to complete and transmit before the comms window closes.
+### Phase 1 — Threat Agent (Qwen2.5-14B, 300 GRPO steps)
 
-- **Tests:** Basic resource management, action sequencing, comms window awareness
-- **No threat pipeline active**
-- **Expected frontier model score:** 0.75–0.90
+| Step | Loss | Token Accuracy |
+|---|---|---|
+| 0 | 3.6792 | 47.9% |
+| 100 | 1.6721 | 67.8% |
+| 200 | 0.4894 | 90.4% |
+| 300 | **0.2463** | **94.7%** |
 
-**Grader formula:**
-```
-score = (objectives_completed/3)*0.5 + (data_transmitted ? 0.25 : 0) + resource_efficiency_bonus(0.0–0.25)
-```
+**Loss: 3.68 → 0.24 (93.3% reduction). Accuracy: 47.9% → 94.7% (+97.7%).**
 
----
+### Phase 1 — Computational Agent (Qwen2.5-7B, 200 GRPO steps)
 
-### Task 2 — The Opportunity Dilemma (Medium)
+Loss: 3.87 → 0.44. Token accuracy: 48.4% → 92.0%.
 
-Power 52%, Fuel 68%, 360-minute window. A solar flare is detected at episode start — it will hit in 60 minutes. Simultaneously, a rare stellar alignment opens a HIGH-priority science window that expires in 90 minutes. Triage costs 18% power. Science capture costs 15% power. The agent cannot do both fully.
+### Phase 2 — SarvaDrishti Orchestrator (Qwen2.5-14B, 400 GRPO steps)
 
-- **Tests:** Prioritization, resource allocation under competing urgent demands
-- **Threat pipeline partially active** — triage can start but may not complete depending on power allocation
-- **Key mechanic:** Triage below 60% confidence → only blind maneuver available (fuel penalty). Agent must decide how much to invest in triage vs science.
-- **Expected frontier model score:** 0.45–0.65
+Reward: **0.921 – 0.947** consistently. Std ~0.003 — low variance indicates a converged coordination policy.
 
-**Grader formula:**
-```
-score = science_value_captured*0.35 + threat_handling_quality*0.40 + resource_state_at_end*0.25
-```
+### Stage Progression
 
----
+| Stage | Mean Reward | Threat Survival | Coordination |
+|---|---|---|---|
+| Baseline (rule-based) | 0.21 | 58% | 0.00 |
+| After Phase 1 | 0.55 | 79% | 0.20 |
+| After Phase 1.5 | 0.59 | 82% | 0.45 |
+| **After Phase 2** | **0.93** | **94%** | **0.93** |
 
-### Task 3 — Full Threat Response Pipeline (Hard)
+### All 10 Trained Checkpoints on HF Hub
 
-Power 71%, Fuel 44%, 480-minute window. A debris field is detected at T+60 minutes (mid-episode). The agent must run the full AkashBodh pipeline on it. At some point after T+120 (random, seeded), a second threat (solar flare) appears. The agent must manage two parallel pipeline tracks with a shared resource pool. One comms window available — must choose between Earth notification and science data transmission.
-
-- **Tests:** Parallel sequential reasoning, pipeline interleaving, expected-value decision-making under uncertainty
-- **Full threat pipeline active** — both tracks running simultaneously
-- **Expected frontier model score:** 0.30–0.50
-
-**Grader formula:**
-```
-score = threat1_resolution*0.30 + threat2_resolution*0.25 + science_captured*0.20 + survival_bonus*0.15 + process_quality*0.10
-```
-
----
-
-## Reward Function
-
-Partial signal at every step — not just binary episode end.
-
-| Event | Reward |
-|-------|--------|
-| Complete HIGH priority science objective | +0.25 |
-| Complete MEDIUM priority science objective | +0.12 |
-| Complete LOW priority science objective | +0.05 |
-| Transmit science data before comms blackout | +0.10 per batch |
-| Successful evasive maneuver (threat resolved) | +0.08 |
-| Triage completed before response action | +0.04 |
-| Notify Earth during critical threat | +0.05 |
-| Power drops to 0% (mission abort) | **-0.50** |
-| Fuel exhausted (trajectory loss) | **-0.40** |
-| Instrument destroyed by unhandled threat | -0.20 |
-| Science data lost (buffer overflow + blackout) | -0.15 |
-| Blind maneuver without any triage | -0.05 |
-| Defer used 4+ times consecutively | -0.04 per extra |
-| Baseline time cost | -0.005 per step |
+| Checkpoint | Model | Phase |
+|---|---|---|
+| `D3V1601/VyomRaksha-threat-lora` | Qwen2.5-14B | Phase 1 + 1.5 |
+| `D3V1601/VyomRaksha-power-lora` | Qwen2.5-7B | Phase 1 + 1.5 |
+| `D3V1601/VyomRaksha-fuel-lora` | Qwen2.5-7B | Phase 1 + 1.5 |
+| `D3V1601/VyomRaksha-thermal-lora` | Qwen2.5-7B | Phase 1 + 1.5 |
+| `D3V1601/VyomRaksha-computational-lora` | Qwen2.5-7B | Phase 1 + 1.5 |
+| `D3V1601/VyomRaksha-structural-lora` | Qwen2.5-7B | Phase 1 + 1.5 |
+| `D3V1601/VyomRaksha-communications-lora` | Qwen2.5-7B | Phase 1 + 1.5 |
+| `D3V1601/VyomRaksha-probe_systems-lora` | Qwen2.5-7B | Phase 1 + 1.5 |
+| `D3V1601/VyomRaksha-sarvadrishi-reward-model` | Qwen2.5-3B | Pre-Phase 2 |
+| `D3V1601/VyomRaksha-SarvaDrishti-lora` | Qwen2.5-14B | Phase 2 |
 
 ---
 
-## Project Structure
+## Training Pipeline
 
 ```
-vyomraksha/
-├── CLAUDE.md                    # Project bible for Claude Code sessions
-├── progress.md                  # Session log — read at start, update at end
-├── todo.md                      # Implementation checklist (14 phases)
-├── openenv.yaml                 # OpenEnv manifest
-├── pyproject.toml               # Package + dependencies
-├── README.md                    # This file
-├── models.py                    # Pydantic: ProbeObservation, ProbeAction, ProbeState
-├── client.py                    # VyomRakshaEnv WebSocket client
-├── missions/
-│   ├── task1_routine.json       # Task 1 mission scenario
-│   ├── task2_dilemma.json       # Task 2 mission scenario
-│   └── task3_response.json      # Task 3 mission scenario
-├── server/
-│   ├── app.py                   # FastAPI server
-│   ├── environment.py           # VyomRakshaEnvironment(Environment)
-│   ├── probe_sim.py             # Resource engine: power/fuel/time
-│   ├── cosmic_events.py         # Physics-lite event generator
-│   ├── threat_pipeline.py       # AkashBodh 5-stage pipeline
-│   ├── graders.py               # Task grader functions
-│   ├── reward.py                # Reward computation
-│   ├── constants.py             # All magic numbers in one place
-│   ├── requirements.txt         # Server-side dependencies
-│   └── Dockerfile               # Container definition
-├── baseline/
-│   ├── inference_simple.py      # Single-turn OpenAI agent
-│   └── inference_multiturn.py   # Multi-turn conversation agent
-└── tests/
-    ├── test_models.py
-    ├── test_resources.py
-    ├── test_events.py
-    ├── test_pipeline.py
-    ├── test_graders.py
-    └── test_endpoints.py
+Phase 0  — Expert data generation (200 demos, 164 preference pairs via Groq API)
+Phase 1  — Sub-agent specialization: 8 agents trained in isolation via GRPO
+           Threat: Qwen2.5-14B, 300 steps | Others: Qwen2.5-7B, 200 steps
+Phase 1.5 — Joint exposure: all 8 agents trained on cross-domain scenarios
+Phase Pre-2 — Reward model: Qwen2.5-3B, Bradley-Terry on 164 preference pairs
+Phase 2  — SarvaDrishti: Qwen2.5-14B, 400 steps, frozen sub-agents
+Phase 3  — Emergency authority calibration (future scope)
 ```
+
+**Algorithm:** GRPO (Group Relative Policy Optimization) throughout — no critic network needed, verifiable rewards.
+
+**Optimization:** QLoRA (4-bit quantization, LoRA r=16, alpha=32)
 
 ---
 
-## Setup & Installation
-
-### Prerequisites
-
-- Python 3.11+
-- Docker (for containerized runs and HF deployment)
-- An OpenAI API key (for baseline scripts)
-- A Hugging Face account with write access to Spaces (for deployment)
-
-### Option A — pip (standard)
+## Setup
 
 ```bash
+# Install
 pip install openenv-core
 pip install -e ".[dev]"
+
+# Run server locally
+uvicorn server.app:app --host 0.0.0.0 --port 7860
+
+# Validate OpenEnv compliance
+openenv validate --url https://d3v1601-vyomraksha.hf.space
 ```
 
-### Option B — uv (faster, recommended)
+---
+
+## Reproducing Training
+
+See the Colab notebook for a full end-to-end demo:
+**https://huggingface.co/spaces/D3V1601/vyomraksha/blob/main/training/vyomraksha_grpo_demo.ipynb**
+
+For full-scale training (requires GPU):
 
 ```bash
-pip install uv
-uv pip install openenv-core
-uv pip install -e ".[dev]"
+# Phase 1 — sub-agent specialization
+python training/train_sub_agent.py --agent threat --model_size 14b --steps 300 --push_to_hub
+
+# Phase 2 — SarvaDrishti
+python training/train_sarvadrishi.py --steps 400 --push_to_hub
 ```
 
 ---
 
-## Running the Environment
-
-```bash
-# Start the FastAPI server
-uvicorn server.app:app --host 0.0.0.0 --port 7860 --reload
-
-# Server is now live at http://localhost:7860
-```
-
-### Verify the server is running
-
-```bash
-curl http://localhost:7860/state
-curl http://localhost:7860/tasks
-curl -X POST http://localhost:7860/reset -H "Content-Type: application/json" -d '{"task_id": 1}'
-```
-
----
-
-## Running the Baseline Agent
-
-```bash
-# Simple baseline (single-turn prompt per step)
-python baseline/inference_simple.py
-
-# Multi-turn baseline (maintains episode history)
-python baseline/inference_multiturn.py
-```
-
----
-
-## Running Tests
-
-```bash
-pytest tests/ -v
-pytest tests/ --cov=server --cov-report=term-missing
-```
-
----
-
-## Validate OpenEnv Compliance
-
-```bash
-openenv validate
-```
----
-
-## Simulation Model
-
-VyomRaksha uses a **physics-lite abstraction** — not full orbital mechanics. Numbers are calibrated to be directionally realistic based on real mission parameters (Curiosity power budget ~400W, Cassini flare response protocols, New Horizons fuel budgets).
-
-### Fixed seeds (for reproducibility)
-
-| Task | Seed | Controls |
-|------|------|---------|
-| Task 1 | 42 | No random events (seed unused but set for consistency) |
-| Task 2 | 137 | Solar flare intensity sampling |
-| Task 3 | 999 | Second threat appearance time + type + intensity |
-
----
-
-## The Name
-
-**VyomRaksha** — from Sanskrit: *Vyom* (cosmos/space) + *Raksha* (protection/defense). Maps directly to the environment's core mechanic: protecting a spacecraft through intelligent decision-making in the cosmos.
-
-**AkashBodh** — from Sanskrit: *Akash* (sky/space) + *Bodh* (awareness/intelligence). The internal name for the threat detection pipeline module.
-
-Named in the spirit of ISRO's mission naming tradition: Mangalyaan (Mars Craft), Chandrayaan (Moon Craft), Aditya (Sun).
-
----
+**Team:** 3 Musketeers — Sardar Patel Institute of Technology, Mumbai
+**Hackathon:** Meta PyTorch × Scaler OpenEnv Hackathon, April 2026
