@@ -105,7 +105,7 @@ All training ran on **AWS g5.2xlarge instances (NVIDIA A10G, 24GB VRAM)** using 
 
 The Threat agent is the most complex and highest-stakes component of the system. It uses a 6-step chain-of-thought reasoning pipeline and initiates cascade alerts to other sub-agents. We gave it the larger 14B model and the most training steps.
 
-![Phase 1 Threat Agent — Loss and Accuracy](charts/phase1_threat_headline.png)
+![Phase 1 Threat Agent — Loss and Accuracy](https://huggingface.co/datasets/D3V1601/VyomRaksha-training-charts/resolve/main/phase1_threat_headline.png)
 
 Starting from random initialisation after SFT warmup, the model converged from a loss of 3.68 to 0.26 — a 93% reduction — and token accuracy climbed from 47.9% to 94.7% over 300 steps. The learning was smooth and consistent, with no signs of instability. By the end of training, the agent was reliably producing structured JSON recommendations with calibrated urgency scores, correctly triggering cascade alerts, and requesting the right depth of compute analysis from the Computational sub-agent.
 
@@ -115,7 +115,7 @@ Starting from random initialisation after SFT warmup, the model converged from a
 
 The six 7B agents and the Threat 14B agent all followed similar convergence trajectories. All eight were trained to completion on AWS A10G GPUs. The loss curves below are from actual AWS training logs.
 
-![Phase 1 All 8 Agents Training Loss](charts/phase1_loss_all_agents.png)
+![Phase 1 All 8 Agents Training Loss](https://huggingface.co/datasets/D3V1601/VyomRaksha-training-charts/resolve/main/phase1_loss_all_agents.png)
 
 The **Threat** sub-agent on Qwen2.5-14B achieved a final loss of 0.26, down 93% from 3.68 at initialisation. This was the strongest result of the Phase 1 runs, which is expected given both the model size and the higher step count.
 
@@ -139,7 +139,7 @@ The **Probe Systems** sub-agent on Qwen2.5-7B achieved a final loss of 0.24, dow
 
 Token accuracy measures whether the model produces correct output tokens — essentially, whether it outputs the right action, the right urgency value, and well-formed reasoning. All eight agents exceeded 90% accuracy by the end of Phase 1.
 
-![Phase 1 All 8 Agents Token Accuracy](charts/phase1_accuracy_all_agents.png)
+![Phase 1 All 8 Agents Token Accuracy](https://huggingface.co/datasets/D3V1601/VyomRaksha-training-charts/resolve/main/phase1_accuracy_all_agents.png)
 
 | Sub-Agent | Model | Steps | Loss Start → End | Accuracy Start → End |
 |---|---|---|---|---|
@@ -158,7 +158,7 @@ Token accuracy measures whether the model produces correct output tokens — ess
 
 After each agent had specialised in isolation, we ran a joint exposure phase where all eight agents trained together on cross-domain scenarios. This is where they learned to handle situations like a Threat cascade alert arriving while they are mid-deliberation, or the Power agent entering conservation mode which changes available action space for other agents. The reward signals in Phase 1.5 are small in absolute terms — reflecting that the IsolatedResourceEnv reward scale differs from the full multi-agent system — but the phase produced measurable improvements in coordination quality that showed up in Phase 2 evaluation.
 
-![Phase 1.5 Threat Sub-Agent GRPO Reward](charts/phase15_threat_reward.png)
+![Phase 1.5 Threat Sub-Agent GRPO Reward](https://huggingface.co/datasets/D3V1601/VyomRaksha-training-charts/resolve/main/phase15_threat_reward.png)
 
 ---
 
@@ -166,7 +166,7 @@ After each agent had specialised in isolation, we ran a joint exposure phase whe
 
 SarvaDrishti showed a fundamentally different training pattern from the sub-agents. Rather than a smooth loss descent, its reward curve ranged between 0.78 and 0.85 throughout training, with a mean of approximately 0.82. This is expected and desirable.
 
-![Phase 2 SarvaDrishti Reward Curve](charts/phase2_sarvadrishi_reward.png)
+![Phase 2 SarvaDrishti Reward Curve](https://huggingface.co/datasets/D3V1601/VyomRaksha-training-charts/resolve/main/phase2_sarvadrishi_reward.png)
 
 The flatness does not indicate a failure to learn. It indicates that SarvaDrishti begins training with a strong prior — Qwen2.5-14B already has sophisticated reasoning capabilities — and GRPO is refining coordination quality rather than teaching the model a new task from scratch. The rolling mean shows reward stabilising in the upper band of the range by the later steps, and the standard deviation of approximately 0.02 is low, indicating consistent decision quality. A well-trained orchestrator should produce stable high-reward decisions, not fluctuating ones.
 
@@ -176,7 +176,7 @@ The flatness does not indicate a failure to learn. It indicates that SarvaDrisht
 
 The chart below shows how system performance improved across all training phases, measured on three dimensions: mean episode reward, threat survival rate, and multi-agent coordination score.
 
-![Overall Training Progression Baseline to Phase 2](charts/overall_progression.png)
+![Overall Training Progression Baseline to Phase 2](https://huggingface.co/datasets/D3V1601/VyomRaksha-training-charts/resolve/main/overall_progression.png)
 
 | Stage | Mean Reward | Threat Survival | Coordination |
 |---|---|---|---|
