@@ -1,25 +1,0 @@
-nohup: ignoring input
-2026-04-26 05:56:27,066 INFO __main__ — Phase 3 emergency calibration: agents=['threat', 'power', 'thermal', 'probe_systems', 'structural', 'communications'] steps=100
-2026-04-26 05:56:27,066 INFO __main__ — Phase 3 calibration: agent=threat scope=full steps=100
-/home/ubuntu/Meta-Hack-VyomRaksha/.venv/lib/python3.12/site-packages/transformers/utils/hub.py:110: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
-  warnings.warn(
-2026-04-26 05:56:32,433 INFO accelerate.utils.modeling — We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
-Loading checkpoint shards:   0%|          | 0/8 [00:00<?, ?it/s]Loading checkpoint shards:  12%|█▎        | 1/8 [00:06<00:46,  6.71s/it]Loading checkpoint shards:  25%|██▌       | 2/8 [00:10<00:29,  4.95s/it]Loading checkpoint shards:  38%|███▊      | 3/8 [00:23<00:42,  8.47s/it]Loading checkpoint shards:  50%|█████     | 4/8 [00:26<00:25,  6.47s/it]Loading checkpoint shards:  62%|██████▎   | 5/8 [00:30<00:16,  5.51s/it]Loading checkpoint shards:  75%|███████▌  | 6/8 [00:35<00:10,  5.36s/it]Loading checkpoint shards:  88%|████████▊ | 7/8 [00:38<00:04,  4.69s/it]Loading checkpoint shards: 100%|██████████| 8/8 [00:38<00:00,  3.29s/it]Loading checkpoint shards: 100%|██████████| 8/8 [00:38<00:00,  4.87s/it]
-2026-04-26 05:57:13,164 WARNING __main__ — Could not partially unfreeze threat: only Tensors of floating point and complex dtype can require gradients
-Using the `WANDB_DISABLED` environment variable is deprecated and will be removed in v5. Use the --report_to flag to control the integrations used for logging result (for instance --report_to none).
-Using the `WANDB_DISABLED` environment variable is deprecated and will be removed in v5. Use the --report_to flag to control the integrations used for logging result (for instance --report_to none).
-Using the `WANDB_DISABLED` environment variable is deprecated and will be removed in v5. Use the --report_to flag to control the integrations used for logging result (for instance --report_to none).
-Traceback (most recent call last):
-  File "/home/ubuntu/Meta-Hack-VyomRaksha/training/train_emergency.py", line 507, in <module>
-    main()
-  File "/home/ubuntu/Meta-Hack-VyomRaksha/training/train_emergency.py", line 497, in main
-    _run_emergency_training(
-  File "/home/ubuntu/Meta-Hack-VyomRaksha/training/train_emergency.py", line 305, in _run_emergency_training
-    _run_agent_grpo(model, tokenizer, agent_name, steps, reward_fn, output_dir, is_unsloth)
-  File "/home/ubuntu/Meta-Hack-VyomRaksha/training/train_emergency.py", line 363, in _run_agent_grpo
-    config = GRPOConfig(
-             ^^^^^^^^^^^
-  File "<string>", line 199, in __init__
-  File "/home/ubuntu/Meta-Hack-VyomRaksha/.venv/lib/python3.12/site-packages/trl/trainer/grpo_config.py", line 939, in __post_init__
-    raise ValueError(
-ValueError: GRPO requires at least 2 generations per prompt to calculate the advantages. You provided 1, which is less than the minimum required.

@@ -1,15 +1,0 @@
-nohup: ignoring input
-HF_TOKEN found — checkpoints will be pushed to Hub
-=== VyomRaksha Phase 1 — Card 2 — Job local_2312 ===
-Node: ip-172-31-40-146  Started: Sat Apr 25 09:08:21 UTC 2026
-Project: /home/ubuntu/Meta-Hack-VyomRaksha
-Checkpoints: /home/ubuntu/Meta-Hack-VyomRaksha/training/checkpoints
-NVIDIA A10G, 23028 MiB, 580.126.16
-
-Sat Apr 25 09:08:21 UTC 2026 --- [1/5] thermal (Qwen2.5-7B, 200 steps) ---
-2026-04-25 09:08:21,415 INFO __main__ — VyomRaksha Phase 1 training — agent=thermal model_size=7b steps=200 batch_size=4
-2026-04-25 09:08:21,680 WARNING __main__ — Unsloth not available — falling back to HF BitsAndBytes
-/home/ubuntu/Meta-Hack-VyomRaksha/.venv/lib/python3.12/site-packages/transformers/utils/hub.py:110: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
-  warnings.warn(
-2026-04-25 09:08:30,450 INFO __main__ — Loading Qwen/Qwen2.5-7B-Instruct via HF BitsAndBytes 4-bit
-Fetching 4 files:   0%|          | 0/4 [00:00<?, ?it/s]

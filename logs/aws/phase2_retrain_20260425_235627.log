@@ -1,35 +1,0 @@
-nohup: ignoring input
-2026-04-25 23:56:27,078 INFO __main__ — SarvaDrishti training: model=Qwen/Qwen2.5-14B-Instruct steps=275 batch=4
-/home/ubuntu/Meta-Hack-VyomRaksha/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:986: UserWarning: `local_dir_use_symlinks` parameter is deprecated and will be ignored. The process to download files to a local folder has been updated and do not rely on symlinks anymore. You only need to pass a destination folder as`local_dir`.
-For more details, check out https://huggingface.co/docs/huggingface_hub/main/en/guides/download#download-files-to-local-folder.
-  warnings.warn(
-Fetching 11 files:   0%|          | 0/11 [00:00<?, ?it/s]Fetching 11 files:   9%|▉         | 1/11 [00:00<00:01,  5.51it/s]Fetching 11 files:  36%|███▋      | 4/11 [00:01<00:03,  2.12it/s]Fetching 11 files: 100%|██████████| 11/11 [00:01<00:00,  6.12it/s]
-2026-04-25 23:56:29,317 INFO __main__ — Downloaded adapter for power from D3V1601/VyomRaksha-power-lora
-Fetching 11 files:   0%|          | 0/11 [00:00<?, ?it/s]Fetching 11 files:   9%|▉         | 1/11 [00:00<00:03,  2.81it/s]Fetching 11 files:  18%|█▊        | 2/11 [00:00<00:02,  4.05it/s]Fetching 11 files:  36%|███▋      | 4/11 [00:02<00:05,  1.36it/s]Fetching 11 files: 100%|██████████| 11/11 [00:02<00:00,  4.27it/s]
-2026-04-25 23:56:31,926 INFO __main__ — Downloaded adapter for fuel from D3V1601/VyomRaksha-fuel-lora
-Fetching 11 files:   0%|          | 0/11 [00:00<?, ?it/s]Fetching 11 files:   9%|▉         | 1/11 [00:00<00:01,  6.17it/s]Fetching 11 files:  36%|███▋      | 4/11 [00:01<00:03,  1.99it/s]Fetching 11 files: 100%|██████████| 11/11 [00:01<00:00,  5.77it/s]
-2026-04-25 23:56:33,865 INFO __main__ — Downloaded adapter for thermal from D3V1601/VyomRaksha-thermal-lora
-Fetching 11 files:   0%|          | 0/11 [00:00<?, ?it/s]Fetching 11 files:   9%|▉         | 1/11 [00:00<00:01,  7.44it/s]Fetching 11 files:  36%|███▋      | 4/11 [00:01<00:02,  2.52it/s]Fetching 11 files: 100%|██████████| 11/11 [00:01<00:00,  7.28it/s]
-2026-04-25 23:56:35,404 INFO __main__ — Downloaded adapter for computational from D3V1601/VyomRaksha-computational-lora
-Fetching 11 files:   0%|          | 0/11 [00:00<?, ?it/s]Fetching 11 files:   9%|▉         | 1/11 [00:00<00:01,  5.72it/s]Fetching 11 files:  36%|███▋      | 4/11 [00:01<00:03,  1.93it/s]Fetching 11 files: 100%|██████████| 11/11 [00:01<00:00,  5.59it/s]
-2026-04-25 23:56:37,404 INFO __main__ — Downloaded adapter for structural from D3V1601/VyomRaksha-structural-lora
-Fetching 11 files:   0%|          | 0/11 [00:00<?, ?it/s]Fetching 11 files:  18%|█▊        | 2/11 [00:00<00:00, 16.84it/s]Fetching 11 files:  36%|███▋      | 4/11 [00:01<00:03,  2.29it/s]Fetching 11 files: 100%|██████████| 11/11 [00:01<00:00,  7.24it/s]
-2026-04-25 23:56:38,949 INFO __main__ — Downloaded adapter for communications from D3V1601/VyomRaksha-communications-lora
-Fetching 11 files:   0%|          | 0/11 [00:00<?, ?it/s]Fetching 11 files:   9%|▉         | 1/11 [00:00<00:01,  6.43it/s]Fetching 11 files:  36%|███▋      | 4/11 [00:01<00:03,  2.26it/s]Fetching 11 files: 100%|██████████| 11/11 [00:01<00:00,  6.54it/s]
-2026-04-25 23:56:40,663 INFO __main__ — Downloaded adapter for probe_systems from D3V1601/VyomRaksha-probe_systems-lora
-Fetching 11 files:   0%|          | 0/11 [00:00<?, ?it/s]Fetching 11 files:  18%|█▊        | 2/11 [00:00<00:00, 17.02it/s]Fetching 11 files:  36%|███▋      | 4/11 [00:02<00:05,  1.27it/s]Fetching 11 files: 100%|██████████| 11/11 [00:02<00:00,  4.06it/s]
-2026-04-25 23:56:43,399 INFO __main__ — Downloaded adapter for threat from D3V1601/VyomRaksha-threat-lora
-/home/ubuntu/Meta-Hack-VyomRaksha/.venv/lib/python3.12/site-packages/transformers/utils/hub.py:110: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
-  warnings.warn(
-2026-04-25 23:56:52,770 INFO accelerate.utils.modeling — We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
-Loading checkpoint shards:   0%|          | 0/8 [00:00<?, ?it/s]Loading checkpoint shards:  12%|█▎        | 1/8 [00:28<03:22, 28.92s/it]Loading checkpoint shards:  25%|██▌       | 2/8 [00:59<02:58, 29.82s/it]Loading checkpoint shards:  38%|███▊      | 3/8 [01:29<02:29, 29.92s/it]Loading checkpoint shards:  50%|█████     | 4/8 [01:59<02:00, 30.12s/it]Loading checkpoint shards:  62%|██████▎   | 5/8 [02:28<01:28, 29.61s/it]Loading checkpoint shards:  75%|███████▌  | 6/8 [02:43<00:49, 24.53s/it]Loading checkpoint shards:  88%|████████▊ | 7/8 [03:13<00:26, 26.48s/it]Loading checkpoint shards: 100%|██████████| 8/8 [03:26<00:00, 22.17s/it]Loading checkpoint shards: 100%|██████████| 8/8 [03:26<00:00, 25.83s/it]
-Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:29<00:29, 29.28s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:46<00:00, 21.92s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:46<00:00, 23.02s/it]
-Some weights of Qwen2ForSequenceClassification were not initialized from the model checkpoint at Qwen/Qwen2.5-3B-Instruct and are newly initialized: ['score.weight']
-You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
-2026-04-26 00:01:07,733 INFO __main__ — Loaded reward model from training/checkpoints/sarvadrishi_reward_model/
-2026-04-26 00:01:11,501 INFO __main__ — Loaded frozen adapter for power from /home/ubuntu/Meta-Hack-VyomRaksha/training/checkpoints/sarvadrishi/downloaded_adapters/power
-/home/ubuntu/Meta-Hack-VyomRaksha/server/sub_agents/base_agent.py:193: UserWarning: WARNING: Unsloth should be imported before [transformers, peft] to ensure all optimizations are applied. Your code may run slower or encounter memory issues without these optimizations.
-
-Please restructure your imports with 'import unsloth' at the top of your file.
-  from unsloth import FastLanguageModel  # type: ignore[import]
-Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:29<01:27, 29.10s/it]Loading checkpoint shards:  50%|█████     | 2/4 [00:58<00:58, 29.35s/it]
