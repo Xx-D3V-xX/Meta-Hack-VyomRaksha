@@ -82,6 +82,7 @@ _LORA_ENV_VARS: dict[str, str] = {
     "communications": "LORA_COMMUNICATIONS_PATH",
     "probe_systems":  "LORA_PROBE_SYSTEMS_PATH",
     "threat":         "LORA_THREAT_PATH",
+    "sarvadrishi":     "LORA_SARVADRISHI_PATH",
 }
 
 
@@ -139,7 +140,8 @@ class R2VyomRakshaEnvironment(VyomRakshaEnvironment):
         sub_agents = self._load_sub_agents()
 
         # Initialise SarvaDrishti and MultiAgentLoop
-        sarvadrishi = SarvaDrishti()
+        sarvadrishi_path = os.environ.get("LORA_SARVADRISHI_PATH")
+        sarvadrishi = SarvaDrishti(model_path=sarvadrishi_path)
         self._loop = MultiAgentLoop(self._r2_sim, sub_agents, sarvadrishi)
         self._loop.reset_episode_log()
 
