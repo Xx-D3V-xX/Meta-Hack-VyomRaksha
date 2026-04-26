@@ -83,6 +83,7 @@ class SarvaDrishti:
         self,
         initial_strategy: str = "long_horizon_planning",
         earth_directive: str | None = None,
+        model_path: str | None = None,
     ) -> None:
         self._strategy_manager = StrategyManager(initial_strategy)
         self._conflict_resolver = ConflictResolver()
@@ -92,6 +93,10 @@ class SarvaDrishti:
         self._current_science_objective: str = _SCIENCE_OBJECTIVES[0]
         # Step counter — used for proactive strategy updates
         self._step_count: int = 0
+
+        self.model_path = model_path
+        if model_path:
+            log.info("SarvaDrishti: LoRA Adapter path set to %s (loaded at inference time)", model_path)
 
         log.debug(
             "SarvaDrishti init: strategy=%s earth_directive=%s",
