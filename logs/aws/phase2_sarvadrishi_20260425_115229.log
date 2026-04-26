@@ -1,0 +1,28 @@
+nohup: ignoring input
+HF_TOKEN found — checkpoint will be pushed to Hub
+=== VyomRaksha Phase 2 — SarvaDrishti — Job local_13430 ===
+Node: ip-172-31-39-87  Started: Sat Apr 25 11:52:29 UTC 2026
+Project: /home/ubuntu/Meta-Hack-VyomRaksha
+Checkpoints: /home/ubuntu/Meta-Hack-VyomRaksha/training/checkpoints
+NVIDIA A10G, 23028 MiB, 580.126.16
+
+Sat Apr 25 11:52:29 UTC 2026 --- Training SarvaDrishti (Qwen2.5-14B, 1500 steps, batch_size=4) ---
+2026-04-25 11:52:30,035 INFO __main__ — SarvaDrishti training: model=Qwen/Qwen2.5-14B-Instruct steps=1500 batch=4
+/home/ubuntu/Meta-Hack-VyomRaksha/.venv/lib/python3.12/site-packages/transformers/utils/hub.py:110: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+2026-04-25 11:52:37,596 INFO accelerate.utils.modeling — We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+Loading checkpoint shards:   0%|          | 0/8 [00:00<?, ?it/s]Loading checkpoint shards:  12%|█▎        | 1/8 [00:28<03:20, 28.66s/it]Loading checkpoint shards:  25%|██▌       | 2/8 [00:59<02:58, 29.70s/it]Loading checkpoint shards:  38%|███▊      | 3/8 [01:29<02:30, 30.04s/it]Loading checkpoint shards:  50%|█████     | 4/8 [01:59<02:00, 30.20s/it]Loading checkpoint shards:  62%|██████▎   | 5/8 [02:30<01:30, 30.24s/it]Loading checkpoint shards:  75%|███████▌  | 6/8 [03:00<01:00, 30.31s/it]Loading checkpoint shards:  88%|████████▊ | 7/8 [03:31<00:30, 30.35s/it]Loading checkpoint shards: 100%|██████████| 8/8 [03:44<00:00, 24.84s/it]Loading checkpoint shards: 100%|██████████| 8/8 [03:44<00:00, 28.02s/it]
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:29<00:29, 29.27s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:46<00:00, 21.92s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:46<00:00, 23.02s/it]
+Some weights of Qwen2ForSequenceClassification were not initialized from the model checkpoint at Qwen/Qwen2.5-3B-Instruct and are newly initialized: ['score.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+2026-04-25 11:57:09,549 WARNING __main__ — Could not load reward model (Error(s) in loading state_dict for Qwen2ForSequenceClassification:
+	size mismatch for score.modules_to_save.default.weight: copying a param with shape torch.Size([1, 2048]) from checkpoint, the shape in current model is torch.Size([2, 2048]).) — using heuristic scoring
+2026-04-25 11:57:16,198 INFO __main__ — Loaded frozen adapter for power from training/checkpoints/power
+/home/ubuntu/Meta-Hack-VyomRaksha/server/sub_agents/base_agent.py:193: UserWarning: WARNING: Unsloth should be imported before [transformers, peft] to ensure all optimizations are applied. Your code may run slower or encounter memory issues without these optimizations.
+
+Please restructure your imports with 'import unsloth' at the top of your file.
+  from unsloth import FastLanguageModel  # type: ignore[import]
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:29<01:27, 29.14s/it]Loading checkpoint shards:  50%|█████     | 2/4 [00:58<00:58, 29.40s/it]Loading checkpoint shards:  75%|███████▌  | 3/4 [01:28<00:29, 29.42s/it]Loading checkpoint shards: 100%|██████████| 4/4 [01:55<00:00, 28.58s/it]Loading checkpoint shards: 100%|██████████| 4/4 [01:55<00:00, 28.87s/it]
+2026-04-25 11:59:13,404 INFO server.sub_agents.base_agent — SubAgent power loaded LoRA via PEFT from training/checkpoints/power
+2026-04-25 11:59:13,406 INFO __main__ — Loaded frozen adapter for fuel from training/checkpoints/fuel
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]training/cluster_jobs/phase2_sarvadrishi.sh: line 90: 13442 Killed                  python training/train_sarvadrishi.py --steps 1500 --batch_size 4 --sub_agent_checkpoints training/checkpoints/ --reward_model_path training/checkpoints/sarvadrishi_reward_model/ ${PUSH_FLAG}

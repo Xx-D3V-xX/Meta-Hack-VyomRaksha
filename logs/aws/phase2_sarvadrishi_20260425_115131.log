@@ -1,0 +1,9 @@
+nohup: ignoring input
+HF_TOKEN found — checkpoint will be pushed to Hub
+=== VyomRaksha Phase 2 — SarvaDrishti — Job local_13386 ===
+Node: ip-172-31-39-87  Started: Sat Apr 25 11:51:31 UTC 2026
+Project: /home/ubuntu/Meta-Hack-VyomRaksha
+Checkpoints: /home/ubuntu/Meta-Hack-VyomRaksha/training/checkpoints
+NVIDIA A10G, 23028 MiB, 580.126.16
+ERROR: Reward model checkpoint not found at /home/ubuntu/Meta-Hack-VyomRaksha/training/checkpoints/sarvadrishi_reward_model
+Run reward_model.sh first.

@@ -20,7 +20,7 @@ training/checkpoints/**/*.pth
 .hf_cache/
 
 # AWS training logs (can be very large)
-logs/aws/*.log
+!logs/aws/*.log
 
 # Keep PID files and small metadata
 !logs/aws/*.pid

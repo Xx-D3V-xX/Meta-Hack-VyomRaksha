@@ -1,0 +1,30 @@
+Sat Apr 25 07:04:27 UTC 2026 --- Phase 1.5: threat ---
+2026-04-25 07:04:27,715 INFO __main__ — VyomRaksha Phase 1 training — agent=threat model_size=14b steps=200 batch_size=4
+2026-04-25 07:04:27,883 WARNING __main__ — Unsloth not available — falling back to HF BitsAndBytes
+/home/ubuntu/Meta-Hack-VyomRaksha/.venv/lib/python3.12/site-packages/transformers/utils/hub.py:110: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+2026-04-25 07:04:32,542 INFO __main__ — Loading Qwen/Qwen2.5-14B-Instruct via HF BitsAndBytes 4-bit
+2026-04-25 07:04:35,266 INFO accelerate.utils.modeling — We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+Traceback (most recent call last):
+  File "/home/ubuntu/Meta-Hack-VyomRaksha/training/train_sub_agent.py", line 1022, in <module>
+    main()
+  File "/home/ubuntu/Meta-Hack-VyomRaksha/training/train_sub_agent.py", line 983, in main
+    model, tokenizer, is_unsloth = _load_model_and_tokenizer(model_id)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Meta-Hack-VyomRaksha/training/train_sub_agent.py", line 532, in _load_model_and_tokenizer
+    model = AutoModelForCausalLM.from_pretrained(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Meta-Hack-VyomRaksha/.venv/lib/python3.12/site-packages/transformers/models/auto/auto_factory.py", line 604, in from_pretrained
+    return model_class.from_pretrained(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Meta-Hack-VyomRaksha/.venv/lib/python3.12/site-packages/transformers/modeling_utils.py", line 277, in _wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Meta-Hack-VyomRaksha/.venv/lib/python3.12/site-packages/transformers/modeling_utils.py", line 5029, in from_pretrained
+    device_map = _get_device_map(model, device_map, max_memory, hf_quantizer, dtype, keep_in_fp32_regex)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Meta-Hack-VyomRaksha/.venv/lib/python3.12/site-packages/transformers/modeling_utils.py", line 1365, in _get_device_map
+    hf_quantizer.validate_environment(device_map=device_map)
+  File "/home/ubuntu/Meta-Hack-VyomRaksha/.venv/lib/python3.12/site-packages/transformers/quantizers/quantizer_bnb_4bit.py", line 127, in validate_environment
+    raise ValueError(
+ValueError: Some modules are dispatched on the CPU or the disk. Make sure you have enough GPU RAM to fit the quantized model. If you want to dispatch the model on the CPU or the disk while keeping these modules in 32-bit, you need to set `llm_int8_enable_fp32_cpu_offload=True` and pass a custom `device_map` to `from_pretrained`. Check https://huggingface.co/docs/transformers/main/en/main_classes/quantization#offload-between-cpu-and-gpu for more details. 

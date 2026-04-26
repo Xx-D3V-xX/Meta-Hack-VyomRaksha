@@ -1,0 +1,50 @@
+nohup: ignoring input
+HF_TOKEN found — checkpoints will be pushed to Hub
+=== VyomRaksha Phase 1 — Card 1 — Job local_10758 ===
+Node: ip-172-31-39-87  Started: Sat Apr 25 02:45:13 UTC 2026
+Project: /home/ubuntu/Meta-Hack-VyomRaksha
+Checkpoints: /home/ubuntu/Meta-Hack-VyomRaksha/training/checkpoints
+NVIDIA A10G, 23028 MiB, 580.126.16
+
+Sat Apr 25 02:45:13 UTC 2026 --- [1/3] threat (Qwen2.5-14B, 300 steps) ---
+2026-04-25 02:45:13,115 INFO __main__ — VyomRaksha Phase 1 training — agent=threat model_size=14b steps=300 batch_size=4
+2026-04-25 02:45:13,248 WARNING __main__ — Unsloth not available — falling back to HF BitsAndBytes
+/home/ubuntu/Meta-Hack-VyomRaksha/.venv/lib/python3.12/site-packages/transformers/utils/hub.py:110: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+2026-04-25 02:45:18,631 INFO __main__ — Loading Qwen/Qwen2.5-14B-Instruct via HF BitsAndBytes 4-bit
+2026-04-25 02:45:21,284 INFO accelerate.utils.modeling — We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+Loading checkpoint shards:   0%|          | 0/8 [00:00<?, ?it/s]Loading checkpoint shards:  12%|█▎        | 1/8 [00:02<00:18,  2.60s/it]Loading checkpoint shards:  25%|██▌       | 2/8 [00:06<00:19,  3.30s/it]Loading checkpoint shards:  38%|███▊      | 3/8 [00:10<00:17,  3.59s/it]Loading checkpoint shards:  50%|█████     | 4/8 [00:14<00:15,  3.79s/it]Loading checkpoint shards:  62%|██████▎   | 5/8 [00:18<00:11,  3.97s/it]Loading checkpoint shards:  75%|███████▌  | 6/8 [00:23<00:08,  4.22s/it]Loading checkpoint shards:  88%|████████▊ | 7/8 [00:28<00:04,  4.42s/it]Loading checkpoint shards: 100%|██████████| 8/8 [00:28<00:00,  3.10s/it]Loading checkpoint shards: 100%|██████████| 8/8 [00:28<00:00,  3.57s/it]
+2026-04-25 02:45:51,175 INFO __main__ — HF PEFT QLoRA model loaded
+2026-04-25 02:45:51,177 INFO __main__ — Loaded 25 seed demos for threat from /home/ubuntu/Meta-Hack-VyomRaksha/training/data/seed_demos/threat_demos.jsonl
+2026-04-25 02:45:51,177 INFO __main__ — SFT warmup: 25 samples × 3 epochs for agent=threat
+Using the `WANDB_DISABLED` environment variable is deprecated and will be removed in v5. Use the --report_to flag to control the integrations used for logging result (for instance --report_to none).
+Converting train dataset to ChatML:   0%|          | 0/25 [00:00<?, ? examples/s]Converting train dataset to ChatML: 100%|██████████| 25/25 [00:00<00:00, 12225.44 examples/s]
+Applying chat template to train dataset:   0%|          | 0/25 [00:00<?, ? examples/s]Applying chat template to train dataset: 100%|██████████| 25/25 [00:00<00:00, 12733.16 examples/s]
+Tokenizing train dataset:   0%|          | 0/25 [00:00<?, ? examples/s]Tokenizing train dataset: 100%|██████████| 25/25 [00:00<00:00, 1540.32 examples/s]
+Truncating train dataset:   0%|          | 0/25 [00:00<?, ? examples/s]Truncating train dataset: 100%|██████████| 25/25 [00:00<00:00, 13524.78 examples/s]
+The tokenizer has new PAD/BOS/EOS tokens that differ from the model config and generation config. The model config and generation config were aligned accordingly, being updated with the tokenizer's values. Updated tokens: {'bos_token_id': None, 'pad_token_id': 151643}.
+  0%|          | 0/12 [00:00<?, ?it/s]2026-04-25 02:45:53,127 WARNING __main__ — SFT warmup failed (CUDA out of memory. Tried to allocate 136.00 MiB. GPU 0 has a total capacity of 22.06 GiB of which 19.44 MiB is free. Including non-PyTorch memory, this process has 22.03 GiB memory in use. Of the allocated memory 21.49 GiB is allocated by PyTorch, and 242.43 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)) — continuing with GRPO only
+  0%|          | 0/12 [00:00<?, ?it/s]
+Using the `WANDB_DISABLED` environment variable is deprecated and will be removed in v5. Use the --report_to flag to control the integrations used for logging result (for instance --report_to none).
+Using the `WANDB_DISABLED` environment variable is deprecated and will be removed in v5. Use the --report_to flag to control the integrations used for logging result (for instance --report_to none).
+2026-04-25 02:45:53,561 INFO __main__ — Starting GRPO training: agent=threat steps=300 batch_size=4
+Traceback (most recent call last):
+  File "/home/ubuntu/Meta-Hack-VyomRaksha/training/train_sub_agent.py", line 1022, in <module>
+    main()
+  File "/home/ubuntu/Meta-Hack-VyomRaksha/training/train_sub_agent.py", line 1007, in main
+    _run_grpo_loop(
+  File "/home/ubuntu/Meta-Hack-VyomRaksha/training/train_sub_agent.py", line 691, in _run_grpo_loop
+    trainer.train()
+  File "/home/ubuntu/Meta-Hack-VyomRaksha/.venv/lib/python3.12/site-packages/transformers/trainer.py", line 2325, in train
+    return inner_training_loop(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Meta-Hack-VyomRaksha/.venv/lib/python3.12/site-packages/transformers/trainer.py", line 2375, in _inner_training_loop
+    train_dataloader = self.get_train_dataloader()
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Meta-Hack-VyomRaksha/.venv/lib/python3.12/site-packages/transformers/trainer.py", line 1140, in get_train_dataloader
+    return self._get_dataloader(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Meta-Hack-VyomRaksha/.venv/lib/python3.12/site-packages/transformers/trainer.py", line 1109, in _get_dataloader
+    dataloader_params["sampler"] = sampler_fn(dataset)
+                                   ^^^^^^^^^^^^^^^^^^^
+TypeError: GRPOTrainer._get_train_sampler() takes 1 positional argument but 2 were given

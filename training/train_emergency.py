@@ -363,8 +363,8 @@ def _run_agent_grpo(model, tokenizer, agent_name: str, steps: int, reward_fn, ou
         config = GRPOConfig(
             output_dir=os.path.join(output_dir, agent_name),
             max_steps=steps,
-            per_device_train_batch_size=1,
-            num_generations=1,
+            per_device_train_batch_size=2,
+            num_generations=2,
             
             max_completion_length=256,
             learning_rate=1e-5,

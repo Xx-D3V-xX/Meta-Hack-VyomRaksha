@@ -1,0 +1,7 @@
+nohup: ignoring input
+2026-04-26 05:54:49,409 INFO __main__ — Phase 3 emergency calibration: agents=['threat', 'power', 'thermal', 'probe_systems', 'structural', 'communications'] steps=100
+2026-04-26 05:54:49,409 INFO __main__ — Phase 3 calibration: agent=threat scope=full steps=100
+/home/ubuntu/Meta-Hack-VyomRaksha/.venv/lib/python3.12/site-packages/transformers/utils/hub.py:110: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+2026-04-26 05:55:08,831 INFO accelerate.utils.modeling — We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+Loading checkpoint shards:   0%|          | 0/8 [00:00<?, ?it/s]Loading checkpoint shards:  12%|█▎        | 1/8 [00:02<00:16,  2.30s/it]Loading checkpoint shards:  25%|██▌       | 2/8 [00:05<00:17,  2.96s/it]
